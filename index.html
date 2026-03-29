@@ -10,12 +10,15 @@ body {
   background: #0f172a;
   color: white;
   margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 #container {
-  max-width: 600px;
-  margin: auto;
-  padding: 10px;
+  max-width: 800px;
+  width: 100%;
+  margin-top: 20px;
 }
 
 #auth {
@@ -24,41 +27,54 @@ body {
 
 #chat {
   display: none;
-  height: 100vh;
+  height: 80vh;
   display: flex;
   flex-direction: column;
+  border-radius: 10px;
+  background: #1e293b;
+  padding: 10px;
 }
 
 #messages {
   flex: 1;
   overflow-y: auto;
-  background: #020617;
   padding: 10px;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .messageRow {
   display: flex;
+  margin: 5px 0;
 }
 
 .msg {
-  max-width: 70%;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 10px;
+  max-width: 60%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  word-wrap: break-word;
+  position: relative;
 }
 
 .me {
   background: #22c55e;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
 }
 
 .other {
   background: #334155;
+  color: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
 }
 
 .meta {
-  font-size: 11px;
+  font-size: 10px;
   color: #cbd5f5;
+  margin-top: 5px;
+  text-align: right;
 }
 
 input {
@@ -71,28 +87,20 @@ input {
 
 button {
   padding: 10px;
-  margin-top: 5px;
+  margin-left: 5px;
   border: none;
   border-radius: 5px;
-  background: #22c55e;
-  color: white;
   cursor: pointer;
-}
-
-.deleteBtn {
-  background: red;
-  margin-left: 5px;
-}
-
-.reportBtn {
-  background: orange;
-  margin-left: 5px;
 }
 
 #inputArea {
   display: flex;
   gap: 5px;
+  margin-top: 5px;
 }
+
+.deleteBtn { background: red; }
+.reportBtn { background: orange; }
 </style>
 </head>
 
@@ -102,20 +110,16 @@ button {
 
   <div id="auth">
     <h2>🔐 Login / Registro</h2>
-
     <input id="name" placeholder="Nome (registro)">
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Senha">
-
     <button onclick="register()">Registrar</button>
     <button onclick="login()">Entrar</button>
   </div>
 
   <div id="chat">
     <p id="userInfo"></p>
-
     <div id="messages"></div>
-
     <div id="inputArea">
       <input id="msg" placeholder="Digite...">
       <button onclick="sendMessage()">Enviar</button>
@@ -126,27 +130,8 @@ button {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  deleteDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
@@ -181,39 +166,49 @@ signOut(auth);
 
 // registro
 window.register = async () => {
-  const userCred = await createUserWithEmailAndPassword(
-    auth,
-    emailInput.value,
-    passwordInput.value
-  );
-
+  const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   await setDoc(doc(db, "users", userCred.user.uid), {
-    name: nameInput.value
+    name: nameInput.value,
+    loggedIn: false
   });
-
   alert("Conta criada!");
 };
 
 // login
 window.login = async () => {
-  await signInWithEmailAndPassword(
-    auth,
-    emailInput.value,
-    passwordInput.value
-  );
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  const userCred = await signInWithEmailAndPassword(auth, email, password);
+  const userRef = doc(db, "users", userCred.user.uid);
+  const userDoc = await getDoc(userRef);
+
+  if (userDoc.data().loggedIn) {
+    alert("Essa conta já está conectada em outro lugar!");
+    await signOut(auth);
+    return;
+  }
+
+  await updateDoc(userRef, { loggedIn: true });
 };
+
+// logout ao sair da aba
+window.addEventListener("beforeunload", async () => {
+  if (currentUser) {
+    const userRef = doc(db, "users", currentUser.uid);
+    await updateDoc(userRef, { loggedIn: false });
+  }
+});
 
 // estado auth
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
-
     const userDoc = await getDoc(doc(db, "users", user.uid));
     username = userDoc.data().name;
 
     document.getElementById("auth").style.display = "none";
     document.getElementById("chat").style.display = "flex";
-
     userInfo.innerText = "Logado como: " + username;
 
     loadMessages();
@@ -223,27 +218,35 @@ auth.onAuthStateChanged(async (user) => {
 // enviar msg
 window.sendMessage = async () => {
   if (!msg.value.trim()) return;
-
   await addDoc(collection(db, "messages"), {
     text: msg.value,
     user: username,
     uid: currentUser.uid,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    reportedBy: []
   });
-
   msg.value = "";
 };
 
 // denunciar
 window.reportMessage = async (msgData) => {
+  if (msgData.reportedBy.includes(currentUser.uid)) {
+    alert("Você já denunciou essa mensagem!");
+    return;
+  }
+
+  // atualizar array de denunciantes
+  const msgRef = doc(db, "messages", msgData.id);
+  await updateDoc(msgRef, { reportedBy: [...msgData.reportedBy, currentUser.uid] });
+
   await fetch(DISCORD_WEBHOOK, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
       content:
         "🚨 DENÚNCIA\n\n" +
-        "👤 Reportado: " + msgData.user + "\n" +
-        "🧑 Quem Reportou: " + username + "\n" +
+        "👤 Denunciado: " + msgData.user + "\n" +
+        "🧑 Denunciante: " + username + "\n" +
         "💬 Mensagem: " + msgData.text
     })
   });
@@ -257,43 +260,29 @@ function loadMessages() {
 
   onSnapshot(q, (snapshot) => {
     messages.innerHTML = "";
-
     snapshot.forEach((docSnap) => {
       const msgData = docSnap.data();
-      const id = docSnap.id;
+      msgData.id = docSnap.id;
 
       const isMe = msgData.uid === currentUser.uid;
-
-      let time = "";
-      if (msgData.createdAt) {
-        time = new Date(msgData.createdAt.seconds * 1000)
-          .toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-      }
+      let time = msgData.createdAt ? new Date(msgData.createdAt.seconds * 1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}) : "";
 
       let html = `
-        <div class="messageRow" style="justify-content:${isMe ? "flex-end" : "flex-start"}">
-          <div class="msg ${isMe ? "me" : "other"}">
+        <div class="messageRow" style="justify-content:${isMe ? "flex-end":"flex-start"}">
+          <div class="msg ${isMe ? "me":"other"}">
             <b>${msgData.user}</b><br>
             ${msgData.text}
             <div class="meta">${time}</div>
-            <button class="reportBtn"
-              onclick='reportMessage(${JSON.stringify(msgData)})'>
-              Denunciar
-            </button>
+            <button class="reportBtn" onclick='reportMessage(${JSON.stringify(msgData)})'>Denunciar</button>
       `;
 
       if (currentUser.uid === ADMIN_UID) {
-        html += `<button class="deleteBtn" onclick="deleteMessage('${id}')">Apagar</button>`;
+        html += `<button class="deleteBtn" onclick="deleteMessage('${msgData.id}')">Apagar</button>`;
       }
 
       html += `</div></div>`;
-
       messages.innerHTML += html;
     });
-
     messages.scrollTop = messages.scrollHeight;
   });
 }
