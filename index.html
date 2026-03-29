@@ -2,36 +2,61 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Chat Seguro</title>
-
+<title>Chat Profissional</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg-primary: #0f172a;
+  --bg-chat: #1e293b;
+  --msg-me: #22c55e;
+  --msg-other: #334155;
+  --text-meta: #cbd5f5;
+}
+
 body {
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
   margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  min-height: 100vh;
+  color: white;
 }
 
 #container {
-  max-width: 800px;
-  width: 100%;
-  margin-top: 20px;
+  max-width: 900px;
+  width: 95%;
+  margin-top: 30px;
 }
 
 #auth {
-  margin-top: 40px;
+  text-align: center;
+}
+
+#auth input {
+  display: block;
+  width: 80%;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+#auth button {
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 #chat {
   display: none;
-  height: 80vh;
-  display: flex;
   flex-direction: column;
+  height: 80vh;
+  background-color: var(--bg-chat);
   border-radius: 10px;
-  background: #1e293b;
   padding: 10px;
 }
 
@@ -41,83 +66,68 @@ body {
   padding: 10px;
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
-/* Bolhas estilo WhatsApp */
 .messageRow {
   display: flex;
-  margin: 5px 0;
 }
 
 .msg {
   max-width: 60%;
-  padding: 10px 15px;
+  padding: 12px 16px;
   word-wrap: break-word;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   position: relative;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  animation: fadeIn 0.2s ease-in-out;
 }
 
 .me {
-  background: #22c55e;
+  background-color: var(--msg-me);
   color: white;
-  align-self: flex-end;
+  margin-left: auto;
   border-radius: 20px 20px 0 20px;
 }
 
 .other {
-  background: #334155;
+  background-color: var(--msg-other);
   color: white;
-  align-self: flex-start;
+  margin-right: auto;
   border-radius: 20px 20px 20px 0;
 }
 
 .meta {
   font-size: 10px;
-  color: #cbd5f5;
+  color: var(--text-meta);
   margin-top: 5px;
   text-align: right;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 5px;
-  border: none;
-}
-
-button {
-  padding: 10px;
-  margin-left: 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 #inputArea {
   display: flex;
   gap: 5px;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
-.deleteBtn { background: red; }
-.reportBtn { background: orange; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+#inputArea input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
 }
+
+button.deleteBtn { background: red; color: white; }
+button.reportBtn { background: orange; color: white; }
+
+button:hover { opacity: 0.85; }
 </style>
 </head>
-
 <body>
-
 <div id="container">
 
   <div id="auth">
-    <h2>🔐 Login / Registro</h2>
-    <input id="name" placeholder="Nome (registro)">
+    <h2>Chat Profissional 🔒</h2>
+    <input id="name" placeholder="Nome (Registro)">
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Senha">
     <button onclick="register()">Registrar</button>
@@ -128,7 +138,7 @@ button {
     <p id="userInfo"></p>
     <div id="messages"></div>
     <div id="inputArea">
-      <input id="msg" placeholder="Digite...">
+      <input id="msg" placeholder="Digite sua mensagem...">
       <button onclick="sendMessage()">Enviar</button>
     </div>
   </div>
@@ -140,7 +150,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Configurações do Firebase
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
@@ -150,7 +160,6 @@ const firebaseConfig = {
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
   measurementId: "G-3TJ325N7MQ"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -159,65 +168,42 @@ const db = getFirestore(app);
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const msg = document.getElementById("msg");
+const msgInput = document.getElementById("msg");
 const messages = document.getElementById("messages");
 const userInfo = document.getElementById("userInfo");
 
-// Configs
+// Admin UID e Discord Webhook
 const ADMIN_UID = "COLE_UID_AQUI";
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
 
 let currentUser = null;
 let username = "";
 
-// Logout automático ao recarregar
+// Logout automático
 signOut(auth);
 
 // Registro
 window.register = async () => {
-  if (!nameInput.value.trim() || !emailInput.value.trim() || !passwordInput.value.trim()) {
-    alert("Preencha todos os campos!");
-    return;
-  }
+  if (!nameInput.value.trim() || !emailInput.value.trim() || !passwordInput.value.trim()) return alert("Preencha todos os campos!");
 
   const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-  await setDoc(doc(db, "users", userCred.user.uid), {
-    name: nameInput.value,
-    loggedIn: false
-  });
-  alert("Conta criada!");
+  await setDoc(doc(db, "users", userCred.user.uid), { name: nameInput.value });
+  alert("Conta criada com sucesso!");
 };
 
 // Login
 window.login = async () => {
-  if (!emailInput.value.trim() || !passwordInput.value.trim()) {
-    alert("Preencha email e senha!");
-    return;
-  }
+  if (!emailInput.value.trim() || !passwordInput.value.trim()) return alert("Preencha email e senha!");
 
   const userCred = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   const userRef = doc(db, "users", userCred.user.uid);
   const userDoc = await getDoc(userRef);
+  if (!userDoc.exists()) return alert("Usuário não encontrado!");
 
-  // Corrigido: checar login simultâneo
-  if (userDoc.exists() && userDoc.data().loggedIn) {
-    alert("Essa conta já está conectada em outro lugar!");
-    await signOut(auth);
-    return;
-  }
-
-  await updateDoc(userRef, { loggedIn: true });
+  username = userDoc.data().name;
 };
 
-// Logout ao sair da aba
-window.addEventListener("beforeunload", async () => {
-  if (currentUser) {
-    const userRef = doc(db, "users", currentUser.uid);
-    await updateDoc(userRef, { loggedIn: false });
-  }
-});
-
-// Estado auth
+// Estado de autenticação
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
@@ -226,7 +212,7 @@ auth.onAuthStateChanged(async (user) => {
 
     document.getElementById("auth").style.display = "none";
     document.getElementById("chat").style.display = "flex";
-    userInfo.innerText = "Logado como: " + username;
+    userInfo.innerText = `Logado como: ${username}`;
 
     loadMessages();
   }
@@ -234,94 +220,62 @@ auth.onAuthStateChanged(async (user) => {
 
 // Enviar mensagem
 window.sendMessage = async () => {
-  if (!msg.value.trim()) return;
+  if (!msgInput.value.trim()) return;
   await addDoc(collection(db, "messages"), {
-    text: msg.value,
+    text: msgInput.value,
     user: username,
     uid: currentUser.uid,
     createdAt: serverTimestamp(),
     reportedBy: []
   });
-  msg.value = "";
+  msgInput.value = "";
 };
 
-// Denunciar mensagem
+// Denunciar
 window.reportMessage = async (msgData) => {
-  // Não pode denunciar sua própria mensagem
-  if (msgData.uid === currentUser.uid) {
-    alert("Você não pode denunciar sua própria mensagem!");
-    return;
-  }
-
-  // Não pode denunciar a mesma mensagem duas vezes
-  if (msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) {
-    alert("Você já denunciou essa mensagem!");
-    return;
-  }
+  if (msgData.uid === currentUser.uid) return;
+  if (msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) return;
 
   const msgRef = doc(db, "messages", msgData.id);
-  const updatedReportedBy = msgData.reportedBy ? [...msgData.reportedBy, currentUser.uid] : [currentUser.uid];
-  await updateDoc(msgRef, { reportedBy: updatedReportedBy });
+  await updateDoc(msgRef, { reportedBy: [...(msgData.reportedBy||[]), currentUser.uid] });
 
   await fetch(DISCORD_WEBHOOK, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      content:
-        "🚨 DENÚNCIA\n\n" +
-        "👤 Denunciado: " + msgData.user + "\n" +
-        "🧑 Denunciante: " + username + "\n" +
-        "💬 Mensagem: " + msgData.text
+      content: `🚨 DENÚNCIA\n👤 Denunciado: ${msgData.user}\n🧑 Denunciante: ${username}\n💬 Mensagem: ${msgData.text}`
     })
   });
-
-  alert("Denúncia enviada com sucesso!");
 };
 
 // Carregar mensagens
 function loadMessages() {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
-
-  onSnapshot(q, (snapshot) => {
+  onSnapshot(q, snapshot => {
     messages.innerHTML = "";
-    snapshot.forEach((docSnap) => {
+    snapshot.forEach(docSnap => {
       const msgData = docSnap.data();
       msgData.id = docSnap.id;
-
       const isMe = msgData.uid === currentUser.uid;
-      let time = msgData.createdAt ? new Date(msgData.createdAt.seconds * 1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}) : "";
+      const time = msgData.createdAt ? new Date(msgData.createdAt.seconds*1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}) : "";
 
-      let html = `
-        <div class="messageRow" style="justify-content:${isMe ? "flex-end":"flex-start"}">
-          <div class="msg ${isMe ? "me":"other"}">
-            <b>${msgData.user}</b><br>
-            ${msgData.text}
-            <div class="meta">${time}</div>
-      `;
+      let html = `<div class="messageRow" style="justify-content:${isMe?"flex-end":"flex-start"}">
+        <div class="msg ${isMe?"me":"other"}">
+          <b>${msgData.user}</b><br>${msgData.text}<div class="meta">${time}</div>`;
 
-      // Mostrar botão de denunciar somente para mensagens dos outros
-      if (!isMe) {
-        html += `<button class="reportBtn" onclick='reportMessage(${JSON.stringify(msgData)})'>Denunciar</button>`;
-      }
-
-      // Mostrar botão de apagar apenas para admins
-      if (currentUser.uid === ADMIN_UID) {
-        html += `<button class="deleteBtn" onclick="deleteMessage('${msgData.id}')">Apagar</button>`;
-      }
-
+      if (!isMe) html += `<button class="reportBtn" onclick='reportMessage(${JSON.stringify(msgData)})'>Denunciar</button>`;
+      if (currentUser.uid === ADMIN_UID) html += `<button class="deleteBtn" onclick="deleteMessage('${msgData.id}')">Apagar</button>`;
       html += `</div></div>`;
       messages.innerHTML += html;
     });
-
     messages.scrollTop = messages.scrollHeight;
   });
 }
 
-// Deletar mensagem
+// Deletar
 window.deleteMessage = async (id) => {
   await deleteDoc(doc(db, "messages", id));
 };
 </script>
-
 </body>
 </html>
