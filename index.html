@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Legion</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    #chat {
+      width: 90%;
+      max-width: 600px;
+      margin: auto;
+      margin-top: 20px;
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      padding: 10px;
+      background: #020617;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 10px;
+      width: 70%;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      background: #22c55e;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💬 Chat</h1>
+
+  <div id="chat">
+    <div id="messages"></div>
+
+    <input id="msg" placeholder="Digite sua mensagem..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 🔥 CONFIG DO SEU FIREBASE
+    const firebaseConfig = {
+  apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
+  authDomain: "legion-chat-d69be.firebaseapp.com",
+  projectId: "legion-chat-d69be",
+  storageBucket: "legion-chat-d69be.firebasestorage.app",
+  messagingSenderId: "880449921734",
+  appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
+};
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 📤 Enviar mensagem
+    window.sendMessage = async function () {
+      const input = document.getElementById("msg");
+
+      if (input.value.trim() === "") return;
+
+      await addDoc(collection(db, "messages"), {
+        text: input.value,
+        createdAt: new Date()
+      });
+
+      input.value = "";
+    };
+
+    // 📥 Receber mensagens em tempo real
+    const q = query(collection(db, "messages"), orderBy("createdAt"));
+
+    onSnapshot(q, (snapshot) => {
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+
+      snapshot.forEach((doc) => {
+        const msg = doc.data();
+        messagesDiv.innerHTML += `<p>💬 ${msg.text}</p>`;
+      });
+
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  </script>
+
+</body>
+</html>
