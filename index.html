@@ -43,6 +43,7 @@ body {
   flex-direction: column;
 }
 
+/* Bolhas estilo WhatsApp */
 .messageRow {
   display: flex;
   margin: 5px 0;
@@ -51,23 +52,24 @@ body {
 .msg {
   max-width: 60%;
   padding: 10px 15px;
-  border-radius: 20px;
   word-wrap: break-word;
   position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .me {
   background: #22c55e;
   color: white;
   align-self: flex-end;
-  border-bottom-right-radius: 0;
+  border-radius: 20px 20px 0 20px; /* cauda no canto inferior direito */
 }
 
 .other {
   background: #334155;
   color: white;
   align-self: flex-start;
-  border-bottom-left-radius: 0;
+  border-radius: 20px 20px 20px 0; /* cauda no canto inferior esquerdo */
 }
 
 .meta {
@@ -101,6 +103,11 @@ button {
 
 .deleteBtn { background: red; }
 .reportBtn { background: orange; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 
@@ -133,6 +140,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// Configurações do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
@@ -140,13 +148,14 @@ const firebaseConfig = {
   storageBucket: "legion-chat-d69be.firebasestorage.app",
   messagingSenderId: "880449921734",
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
+  measurementId: "G-3TJ325N7MQ"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// elementos
+// Elementos
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -154,17 +163,17 @@ const msg = document.getElementById("msg");
 const messages = document.getElementById("messages");
 const userInfo = document.getElementById("userInfo");
 
-// configs
+// Configs
 const ADMIN_UID = "COLE_UID_AQUI";
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
 
 let currentUser = null;
 let username = "";
 
-// logout ao recarregar
+// Logout automático ao recarregar
 signOut(auth);
 
-// registro
+// Registro
 window.register = async () => {
   const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   await setDoc(doc(db, "users", userCred.user.uid), {
@@ -174,11 +183,10 @@ window.register = async () => {
   alert("Conta criada!");
 };
 
-// login
+// Login
 window.login = async () => {
   const email = emailInput.value;
   const password = passwordInput.value;
-
   const userCred = await signInWithEmailAndPassword(auth, email, password);
   const userRef = doc(db, "users", userCred.user.uid);
   const userDoc = await getDoc(userRef);
@@ -192,7 +200,7 @@ window.login = async () => {
   await updateDoc(userRef, { loggedIn: true });
 };
 
-// logout ao sair da aba
+// Logout ao sair da aba
 window.addEventListener("beforeunload", async () => {
   if (currentUser) {
     const userRef = doc(db, "users", currentUser.uid);
@@ -200,7 +208,7 @@ window.addEventListener("beforeunload", async () => {
   }
 });
 
-// estado auth
+// Estado auth
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
@@ -215,7 +223,7 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-// enviar msg
+// Enviar mensagem
 window.sendMessage = async () => {
   if (!msg.value.trim()) return;
   await addDoc(collection(db, "messages"), {
@@ -228,20 +236,27 @@ window.sendMessage = async () => {
   msg.value = "";
 };
 
-// denunciar
+// Denunciar mensagem
 window.reportMessage = async (msgData) => {
-  if (msgData.reportedBy.includes(currentUser.uid)) {
+  // Não pode denunciar sua própria mensagem
+  if (msgData.uid === currentUser.uid) {
+    alert("Você não pode denunciar sua própria mensagem!");
+    return;
+  }
+
+  // Não pode denunciar a mesma mensagem duas vezes
+  if (msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) {
     alert("Você já denunciou essa mensagem!");
     return;
   }
 
-  // atualizar array de denunciantes
   const msgRef = doc(db, "messages", msgData.id);
-  await updateDoc(msgRef, { reportedBy: [...msgData.reportedBy, currentUser.uid] });
+  const updatedReportedBy = msgData.reportedBy ? [...msgData.reportedBy, currentUser.uid] : [currentUser.uid];
+  await updateDoc(msgRef, { reportedBy: updatedReportedBy });
 
   await fetch(DISCORD_WEBHOOK, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       content:
         "🚨 DENÚNCIA\n\n" +
@@ -251,10 +266,10 @@ window.reportMessage = async (msgData) => {
     })
   });
 
-  alert("Denunciado!");
+  alert("Denúncia enviada com sucesso!");
 };
 
-// carregar mensagens
+// Carregar mensagens
 function loadMessages() {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
@@ -283,11 +298,12 @@ function loadMessages() {
       html += `</div></div>`;
       messages.innerHTML += html;
     });
+
     messages.scrollTop = messages.scrollHeight;
   });
 }
 
-// deletar
+// Deletar mensagem
 window.deleteMessage = async (id) => {
   await deleteDoc(doc(db, "messages", id));
 };
