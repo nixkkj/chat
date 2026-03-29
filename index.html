@@ -131,7 +131,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const msg = document.getElementById("msg");
+const messages = document.getElementById("messages");
+const userInfo = document.getElementById("userInfo");
 // 👑 admin
 const ADMIN_UID = "COLE_UID_AQUI";
 
