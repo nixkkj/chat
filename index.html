@@ -1,297 +1,307 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Chat Profissional Melhorado</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --bg-primary: #0b132b;
-    --bg-chat: rgba(15, 23, 42, 0.85);
-    --msg-me-bg: #38b000;
-    --msg-other-bg: rgba(59, 89, 152, 0.85);
-    --btn-report-bg: #ff8c00;
-    --btn-report-hover-bg: #ff6c00;
-    --btn-delete-bg: #d90429;
-    --btn-delete-hover-bg: #a9031e;
-    --text-meta: #d6d9df;
-    --scrollbar-bg: #223355;
-    --scrollbar-thumb: #4a69bd;
-  }
+:root {
+  --bg-primary: #0b132b;
+  --bg-chat: rgba(15, 23, 42, 0.85);
+  --msg-me-bg: #38b000;
+  --msg-other-bg: rgba(59, 89, 152, 0.85);
+  --btn-report-bg: #ff8c00;
+  --btn-report-hover-bg: #ff6c00;
+  --btn-delete-bg: #d90429;
+  --btn-delete-hover-bg: #a9031e;
+  --text-meta: #d6d9df;
+  --scrollbar-bg: #223355;
+  --scrollbar-thumb: #4a69bd;
+}
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-primary);
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    color: white;
-  }
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  color: white;
+}
 
-  #container {
-    width: 100%;
-    max-width: 900px;
-    margin: 30px 10px 50px;
-  }
+#container {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px 10px 50px;
+}
 
-  #auth {
-    text-align: center;
-  }
+#auth {
+  text-align: center;
+}
 
-  #auth input {
-    display: block;
-    width: 80%;
-    max-width: 400px;
-    margin: 10px auto;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: none;
-    background: rgba(255 255 255 / 0.05);
-    color: white;
-    font-size: 16px;
-  }
+#auth input {
+  display: block;
+  width: 80%;
+  max-width: 400px;
+  margin: 10px auto;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255 255 255 / 0.05);
+  color: white;
+  font-size: 16px;
+}
 
-  #auth input::placeholder {
-    color: #cbd5f5;
-  }
+#auth input::placeholder {
+  color: #cbd5f5;
+}
 
-  #auth button {
-    margin: 5px;
-    padding: 12px 28px;
-    border-radius: 10px;
-    border: none;
-    background-color: var(--msg-me-bg);
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
+#auth button {
+  margin: 5px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--msg-me-bg);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-  #auth button:hover {
-    background-color: #2ea400;
-  }
+#auth button:hover {
+  background-color: #2ea400;
+}
 
-  #chat {
-    display: none;
-    height: 80vh;
-    background: var(--bg-chat);
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-  }
+#chat {
+  display: none;
+  height: 80vh;
+  background: var(--bg-chat);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  #userInfo {
-    margin-bottom: 6px;
-    font-weight: 600;
-    text-align: center;
-  }
+#userInfo {
+  margin-bottom: 12px;
+  font-weight: 600;
+  text-align: center;
+}
 
-  #onlineUsers {
-    margin-bottom: 15px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #a0c4ff;
-    min-height: 20px;
-    text-align: center;
-  }
+#onlineUsers {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #cbd5f5;
+}
 
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    scroll-behavior: smooth;
-  }
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
 
-  /* Scrollbar personalizado */
-  #messages::-webkit-scrollbar {
-    width: 10px;
-  }
-  #messages::-webkit-scrollbar-track {
-    background: var(--scrollbar-bg);
-    border-radius: 10px;
-  }
-  #messages::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 10px;
-  }
+#messages::-webkit-scrollbar {
+  width: 10px;
+}
+#messages::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+  border-radius: 10px;
+}
+#messages::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
 
-  .messageRow {
-    display: flex;
-    max-width: 60%;
-    position: relative;
-  }
+.messageRow {
+  display: flex;
+  max-width: 60%;
+  position: relative;
+}
 
-  .me {
-    margin-left: auto;
-    background: var(--msg-me-bg);
-    border-radius: 16px 16px 0 16px;
-    color: white;
-    padding: 12px 16px;
-    box-shadow: 0 3px 8px rgb(56 176 0 / 0.6);
-    word-break: break-word;
-    position: relative;
-  }
+.me {
+  margin-left: auto;
+  background: var(--msg-me-bg);
+  border-radius: 16px 16px 0 16px;
+  color: white;
+  padding: 12px 16px;
+  box-shadow: 0 3px 8px rgb(56 176 0 / 0.6);
+  word-break: break-word;
+  position: relative;
+}
 
-  .other {
-    margin-right: auto;
-    background: var(--msg-other-bg);
-    border-radius: 16px 16px 16px 0;
-    color: white;
-    padding: 12px 16px;
-    box-shadow: 0 3px 8px rgb(59 89 152 / 0.6);
-    word-break: break-word;
-    position: relative;
-  }
+.other {
+  margin-right: auto;
+  background: var(--msg-other-bg);
+  border-radius: 16px 16px 16px 0;
+  color: white;
+  padding: 12px 16px;
+  box-shadow: 0 3px 8px rgb(59 89 152 / 0.6);
+  word-break: break-word;
+  position: relative;
+}
 
-  /* Cauda bolha */
-  .me::after, .other::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 15px;
-    height: 15px;
-    background: inherit;
-  }
-  .me::after {
-    right: -8px;
-    border-bottom-left-radius: 15px;
-    clip-path: polygon(100% 0, 0 100%, 100% 100%);
-    box-shadow: 2px 2px 3px rgb(0 0 0 / 0.2);
-  }
-  .other::after {
-    left: -8px;
-    border-bottom-right-radius: 15px;
-    clip-path: polygon(0 0, 100% 100%, 0 100%);
-    box-shadow: -2px 2px 3px rgb(0 0 0 / 0.2);
-  }
+.me::after, .other::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  background: inherit;
+}
+.me::after {
+  right: -8px;
+  border-bottom-left-radius: 15px;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+  box-shadow: 2px 2px 3px rgb(0 0 0 / 0.2);
+}
+.other::after {
+  left: -8px;
+  border-bottom-right-radius: 15px;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  box-shadow: -2px 2px 3px rgb(0 0 0 / 0.2);
+}
 
-  .messageHeader {
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
+.messageHeader {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
 
-  .meta {
-    font-size: 11px;
-    color: var(--text-meta);
-    text-align: right;
-    margin-top: 6px;
-  }
+.meta {
+  font-size: 11px;
+  color: var(--text-meta);
+  text-align: right;
+  margin-top: 6px;
+}
 
-  #inputArea {
-    margin-top: 15px;
-    display: flex;
-    gap: 12px;
-  }
+#inputArea {
+  margin-top: 15px;
+  display: flex;
+  gap: 12px;
+}
 
-  #inputArea input {
-    flex: 1;
-    padding: 14px 16px;
-    border-radius: 18px;
-    border: none;
-    font-size: 16px;
-    background: rgba(255 255 255 / 0.05);
-    color: white;
-    outline-offset: 2px;
-    transition: outline-color 0.2s;
-  }
+#inputArea input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: none;
+  font-size: 16px;
+  background: rgba(255 255 255 / 0.05);
+  color: white;
+  outline-offset: 2px;
+  transition: outline-color 0.2s;
+}
 
-  #inputArea input::placeholder {
-    color: #d3d9e6aa;
-  }
+#inputArea input::placeholder {
+  color: #d3d9e6aa;
+}
 
-  #inputArea input:focus {
-    outline: 2px solid var(--msg-me-bg);
-  }
+#inputArea input:focus {
+  outline: 2px solid var(--msg-me-bg);
+}
 
-  #inputArea button {
-    padding: 14px 24px;
-    border-radius: 18px;
-    border: none;
-    background-color: var(--msg-me-bg);
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    user-select: none;
-  }
+#inputArea button {
+  padding: 14px 24px;
+  border-radius: 18px;
+  border: none;
+  background-color: var(--msg-me-bg);
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
 
-  #inputArea button:disabled {
-    background-color: #5baa00;
-    cursor: not-allowed;
-  }
+#inputArea button:hover {
+  background-color: #2ea400;
+}
 
-  #inputArea button:hover:not(:disabled) {
-    background-color: #2ea400;
-  }
+/* Botões denunciar e apagar */
+button.reportBtn, button.deleteBtn {
+  border: none;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 11px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  position: absolute;
+  bottom: 10px;
+  box-shadow: 0 0 6px rgb(0 0 0 / 0.8);
+}
 
-  /* Botão denunciar */
-  button.reportBtn {
-    background-color: var(--btn-report-bg);
-    border: none;
-    padding: 6px 10px;
-    font-weight: 700;
-    font-size: 11px;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    box-shadow: 0 0 6px rgb(255 140 0 / 0.8);
-  }
+button.reportBtn {
+  left: 10px;
+  background-color: var(--btn-report-bg);
+}
+button.reportBtn:hover { background-color: var(--btn-report-hover-bg); }
 
-  button.reportBtn:hover {
-    background-color: var(--btn-report-hover-bg);
-  }
+button.deleteBtn {
+  right: 10px;
+  background-color: var(--btn-delete-bg);
+}
+button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
 
-  .messageRow:hover button.reportBtn {
-    opacity: 1;
-  }
+.messageRow:hover button.reportBtn,
+.messageRow:hover button.deleteBtn {
+  opacity: 1;
+}
 
-  /* Botão apagar (admin) */
-  button.deleteBtn {
-    background-color: var(--btn-delete-bg);
-    border: none;
-    padding: 6px 10px;
-    font-weight: 700;
-    font-size: 11px;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    box-shadow: 0 0 6px rgb(217 4 41 / 0.9);
-  }
-
-  button.deleteBtn:hover {
-    background-color: var(--btn-delete-hover-bg);
-  }
-
-  .messageRow:hover button.deleteBtn {
-    opacity: 1;
-  }
-
-  a {
-    color: #ade8f4;
-    text-decoration: underline;
-  }
-  a:hover {
-    color: #90e0ef;
-  }
+/* Toasts */
+#toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+.toast {
+  min-width: 200px;
+  max-width: 300px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideIn 0.4s forwards, fadeOut 0.4s 4.6s forwards;
+  pointer-events: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.toast.success { background-color: #38b000; }
+.toast.error { background-color: #d90429; }
+.toast.info { background-color: #4a69bd; }
+.toast button.closeToast {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateX(100%); }
+}
 </style>
 </head>
 <body>
@@ -307,8 +317,8 @@
   </div>
 
   <div id="chat">
-    <p id="userInfo">Logado como:</p>
-    <p id="onlineUsers"></p> <!-- Lista de usuários online -->
+    <p id="userInfo"></p>
+    <p id="onlineUsers"></p>
     <div id="messages"></div>
     <div id="inputArea">
       <input id="msg" placeholder="Digite sua mensagem..." autocomplete="off" />
@@ -318,16 +328,18 @@
 
 </div>
 
+<div id="toastContainer"></div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
   projectId: "legion-chat-d69be",
-  storageBucket: "legion-chat-d69be.firebasestorage.app",
+  storageBucket: "legion-chat-d69be.appspot.com",
   messagingSenderId: "880449921734",
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
   measurementId: "G-3TJ325N7MQ"
@@ -342,177 +354,159 @@ const passwordInput = document.getElementById("password");
 const msgInput = document.getElementById("msg");
 const messages = document.getElementById("messages");
 const userInfo = document.getElementById("userInfo");
-const onlineUsersElem = document.getElementById("onlineUsers");
-const sendBtn = document.querySelector("#inputArea button");
+const onlineUsersP = document.getElementById("onlineUsers");
 
-const ADMIN_UID = "SEU_ADMIN_UID_AQUI"; // Coloque aqui o UID do admin real
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
+const ADMIN_UID = ""; // coloque UID do admin aqui se quiser
+const DISCORD_WEBHOOK = ""; // opcional webhook
 
 let currentUser = null;
 let username = "";
-let typingTimeout = null;
 
-// Logout automático no reload para garantir estado limpo
-signOut(auth);
+// Função Toast
+function showToast(message, type="info", duration=5000){
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.classList.add("toast", type);
+  toast.innerHTML = `<span>${message}</span><button class="closeToast">&times;</button>`;
+  container.appendChild(toast);
+  toast.querySelector(".closeToast").onclick = () => container.removeChild(toast);
+  setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, duration);
+}
+
+// Limpar inputs
+function clearInputs(){ nameInput.value=""; emailInput.value=""; passwordInput.value=""; msgInput.value=""; }
 
 // Registro
 window.register = async () => {
-  if (!nameInput.value.trim() || !emailInput.value.trim() || !passwordInput.value.trim()) {
-    alert("Preencha todos os campos!");
-    return;
-  }
+  if(!nameInput.value.trim()||!emailInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos!", "error"); return; }
   try {
     const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    await setDoc(doc(db, "users", userCred.user.uid), { name: nameInput.value, online: true, lastOnline: serverTimestamp() });
-    alert("Conta criada com sucesso!");
+    await setDoc(doc(db,"users",userCred.user.uid),{name:nameInput.value, online:true, lastOnline:serverTimestamp()});
+    showToast("Conta criada com sucesso!", "success");
     clearInputs();
-  } catch (e) {
-    alert("Erro no registro: " + e.message);
-  }
+  } catch(e){ showToast("Erro no registro: "+e.message, "error"); }
 };
 
 // Login
 window.login = async () => {
-  if (!emailInput.value.trim() || !passwordInput.value.trim()) {
-    alert("Preencha email e senha!");
-    return;
-  }
+  if(!emailInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha email e senha!", "error"); return; }
   try {
-    const userCred = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    const userRef = doc(db, "users", userCred.user.uid);
-    const userDoc = await getDoc(userRef);
-    if (!userDoc.exists()) {
-      alert("Usuário não encontrado!");
-      return;
-    }
+    const userCred = await signInWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
+    const userDoc = await getDoc(doc(db,"users",userCred.user.uid));
+    if(!userDoc.exists()){ showToast("Usuário não encontrado!", "error"); return; }
     username = userDoc.data().name;
     clearInputs();
-  } catch (e) {
-    alert("Erro no login: " + e.message);
-  }
+  } catch(e){ showToast("Erro no login: "+e.message,"error"); }
 };
 
-function clearInputs() {
-  nameInput.value = "";
-  emailInput.value = "";
-  passwordInput.value = "";
-  msgInput.value = "";
-}
+// Logout automático no reload
+signOut(auth);
 
-// Escuta o estado da autenticação
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
+// Estado Auth
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
     currentUser = user;
-    const userRef = doc(db, "users", user.uid);
+    const userRef = doc(db,"users",user.uid);
     const userDoc = await getDoc(userRef);
-    username = userDoc.exists() ? userDoc.data().name : "Usuário";
+    username = userDoc.exists()?userDoc.data().name:"Usuário";
+    await setDoc(userRef,{online:true,lastOnline:serverTimestamp(),name:username},{merge:true});
 
-    // Atualiza status online no banco
-    await setDoc(userRef, { online: true, lastOnline: serverTimestamp(), name: username }, { merge: true });
-
-    // Atualiza interface
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("chat").style.display = "flex";
-    userInfo.innerText = `Logado como: ${username}`;
-
-    // Foco no campo mensagem
+    document.getElementById("auth").style.display="none";
+    document.getElementById("chat").style.display="flex";
+    userInfo.innerText=`Logado como: ${username}`;
     msgInput.focus();
 
-    // Iniciar escuta das mensagens e dos status online
     loadMessages();
     monitorOnlineUsers();
-    monitorTyping();
-  } else {
+  }else{
     currentUser = null;
-    username = "";
-    document.getElementById("auth").style.display = "block";
-    document.getElementById("chat").style.display = "none";
+    username="";
+    document.getElementById("auth").style.display="block";
+    document.getElementById("chat").style.display="none";
   }
 });
 
 // Enviar mensagem
 window.sendMessage = async () => {
-  if (!msgInput.value.trim()) return;
-
-  sendBtn.disabled = true;
-  msgInput.disabled = true;
-  sendBtn.textContent = "Enviando...";
-
-  try {
-    await addDoc(collection(db, "messages"), {
+  if(!msgInput.value.trim()) return;
+  try{
+    await addDoc(collection(db,"messages"),{
       text: msgInput.value,
       user: username,
       uid: currentUser.uid,
       createdAt: serverTimestamp(),
-      reportedBy: []
+      reportedBy:[]
     });
-    msgInput.value = "";
-  } catch (e) {
-    alert("Erro ao enviar mensagem: " + e.message);
-  }
-
-  sendBtn.disabled = false;
-  msgInput.disabled = false;
-  sendBtn.textContent = "Enviar";
-  msgInput.focus();
+    msgInput.value="";
+    showToast("Mensagem enviada!", "success", 3000);
+  }catch(e){ showToast("Erro ao enviar mensagem: "+e.message,"error"); }
 };
 
 // Denunciar mensagem
 window.reportMessage = async (msgData) => {
-  if (msgData.uid === currentUser.uid) return; // Não pode denunciar a si mesmo
-  if (msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) return; // Já denunciou
-
-  try {
-    const msgRef = doc(db, "messages", msgData.id);
-    const updatedReportedBy = msgData.reportedBy ? [...msgData.reportedBy, currentUser.uid] : [currentUser.uid];
-    await updateDoc(msgRef, { reportedBy: updatedReportedBy });
-
-    // Webhook Discord
-    await fetch(DISCORD_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: `🚨 DENÚNCIA\n👤 Denunciado: ${msgData.user}\n🧑 Denunciante: ${username}\n💬 Mensagem: ${msgData.text}`
-      })
-    });
-  } catch (e) {
-    alert("Erro ao denunciar mensagem: " + e.message);
-  }
+  if(msgData.uid===currentUser.uid) return;
+  if(msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) return;
+  try{
+    const msgRef = doc(db,"messages",msgData.id);
+    const updatedReportedBy = msgData.reportedBy?[...msgData.reportedBy,currentUser.uid]:[currentUser.uid];
+    await updateDoc(msgRef,{reportedBy:updatedReportedBy});
+    showToast("Mensagem denunciada!", "info", 4000);
+  }catch(e){ showToast("Erro ao denunciar: "+e.message,"error"); }
 };
 
 // Deletar mensagem (admin)
 window.deleteMessage = async (id) => {
-  try {
-    await deleteDoc(doc(db, "messages", id));
-  } catch (e) {
-    alert("Erro ao apagar mensagem: " + e.message);
-  }
+  try{ await deleteDoc(doc(db,"messages",id)); showToast("Mensagem apagada!", "info"); }
+  catch(e){ showToast("Erro ao apagar: "+e.message,"error"); }
 };
 
-// Carregar mensagens com escuta real-time
-function loadMessages() {
-  const q = query(collection(db, "messages"), orderBy("createdAt"));
-  onSnapshot(q, snapshot => {
-    messages.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const msgData = docSnap.data();
-      msgData.id = docSnap.id;
-      const isMe = msgData.uid === currentUser.uid;
-      const time = msgData.createdAt ? new Date(msgData.createdAt.seconds * 1000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
+// Escapar HTML
+function escapeHtml(text){ const div=document.createElement("div"); div.textContent=text; return div.innerHTML; }
 
-      // Construir mensagem
-      const row = document.createElement("div");
+// Carregar mensagens
+function loadMessages(){
+  const q=query(collection(db,"messages"),orderBy("createdAt"));
+  onSnapshot(q, snapshot=>{
+    messages.innerHTML="";
+    snapshot.forEach(docSnap=>{
+      const msgData=docSnap.data(); msgData.id=docSnap.id;
+      const isMe=msgData.uid===currentUser.uid;
+      const time=msgData.createdAt?new Date(msgData.createdAt.seconds*1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
+      const row=document.createElement("div");
       row.classList.add("messageRow");
-      row.style.justifyContent = isMe ? "flex-end" : "flex-start";
+      row.style.justifyContent=isMe?"flex-end":"flex-start";
+      const msgDiv=document.createElement("div");
+      msgDiv.classList.add(isMe?"me":"other");
+      msgDiv.innerHTML=`<div class="messageHeader">${msgData.user}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`;
+      if(!isMe && (!msgData.reportedBy || !msgData.reportedBy.includes(currentUser.uid))){
+        const reportBtn=document.createElement("button");
+        reportBtn.classList.add("reportBtn"); reportBtn.textContent="Denunciar";
+        reportBtn.onclick=()=>reportMessage(msgData); msgDiv.appendChild(reportBtn);
+      }
+      if(currentUser.uid===ADMIN_UID){
+        const deleteBtn=document.createElement("button");
+        deleteBtn.classList.add("deleteBtn"); deleteBtn.textContent="Apagar";
+        deleteBtn.onclick=()=>deleteMessage(msgData.id); msgDiv.appendChild(deleteBtn);
+      }
+      row.appendChild(msgDiv);
+      messages.appendChild(row);
+    });
+    messages.scrollTop=messages.scrollHeight;
+  });
+}
 
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add(isMe ? "me" : "other");
-
-      // Conteúdo da mensagem com links clicáveis
-      msgDiv.innerHTML = `<div class="messageHeader">${escapeHtml(msgData.user)}</div><div>${linkify(escapeHtml(msgData.text))}</div><div class="meta">${time}</div>`;
-
-      // Botão denunciar só se for mensagem de outro e não denunciou ainda
-      if (!isMe && (!msgData.reportedBy || !msgData.reportedBy.includes(currentUser.uid))) {
-        const reportBtn = document.createElement("button");
-        reportBtn.classList.add("reportBtn");
-        reportBtn.textContent
+// Monitor online users
+function monitorOnlineUsers(){
+  const q = query(collection(db,"users"));
+  onSnapshot(q, snapshot=>{
+    const onlineUsers=[];
+    snapshot.forEach(docSnap=>{
+      const data=docSnap.data();
+      if(data.online) onlineUsers.push(data.name);
+    });
+    onlineUsersP.innerText="Online: "+(onlineUsers.length>0?onlineUsers.join(", "):"Nenhum");
+  });
+}
+</script>
+</body>
+</html>
