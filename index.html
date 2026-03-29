@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Chat Login Simplificado</title>
+<title>Chat com Logout, Toasts e Som</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <style>
 :root {
@@ -10,10 +10,6 @@
   --bg-chat: rgba(15, 23, 42, 0.85);
   --msg-me-bg: #38b000;
   --msg-other-bg: rgba(59, 89, 152, 0.85);
-  --btn-report-bg: #ff8c00;
-  --btn-report-hover-bg: #ff6c00;
-  --btn-delete-bg: #d90429;
-  --btn-delete-hover-bg: #a9031e;
   --text-meta: #d6d9df;
   --scrollbar-bg: #223355;
   --scrollbar-thumb: #4a69bd;
@@ -30,69 +26,19 @@ body {
   color: white;
 }
 
-#container {
-  width: 100%;
-  max-width: 900px;
-  margin: 30px 10px 50px;
-}
+#container { width: 100%; max-width: 900px; margin: 30px 10px 50px; }
 
-#auth {
-  text-align: center;
-}
-
-#auth input {
-  display: block;
-  width: 80%;
-  max-width: 400px;
-  margin: 10px auto;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255 255 255 / 0.05);
-  color: white;
-  font-size: 16px;
-}
-
+#auth { text-align: center; }
+#auth input { display: block; width: 80%; max-width: 400px; margin: 10px auto; padding: 12px 16px; border-radius: 10px; border: none; background: rgba(255 255 255 / 0.05); color: white; font-size: 16px; }
 #auth input::placeholder { color: #cbd5f5; }
-
-#auth button {
-  margin: 5px;
-  padding: 12px 28px;
-  border-radius: 10px;
-  border: none;
-  background-color: var(--msg-me-bg);
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
+#auth button { margin: 5px; padding: 12px 28px; border-radius: 10px; border: none; background-color: var(--msg-me-bg); font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color 0.2s ease; }
 #auth button:hover { background-color: #2ea400; }
 
-#chat {
-  display: none;
-  height: 80vh;
-  background: var(--bg-chat);
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-#userInfo { margin-bottom: 12px; font-weight: 600; text-align: center; }
+#chat { display: none; height: 80vh; background: var(--bg-chat); border-radius: 20px; box-shadow: 0 8px 20px rgb(0 0 0 / 0.5); padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+#userInfo { margin-bottom: 6px; font-weight: 600; text-align: center; }
 #onlineUsers { font-size: 14px; margin-bottom: 8px; color: #cbd5f5; }
 
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  scroll-behavior: smooth;
-}
+#messages { flex: 1; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
 #messages::-webkit-scrollbar { width: 10px; }
 #messages::-webkit-scrollbar-track { background: var(--scrollbar-bg); border-radius:10px; }
 #messages::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius:10px; }
@@ -110,17 +56,9 @@ body {
 #inputArea button { padding: 14px 24px; border-radius: 18px; border: none; background-color: var(--msg-me-bg); font-weight: 700; color: white; cursor: pointer; transition: background-color 0.2s ease; user-select: none; }
 #inputArea button:hover { background-color: #2ea400; }
 
-/* Botões denunciar e apagar */
-button.reportBtn, button.deleteBtn {
-  border: none; padding: 6px 10px; font-weight: 700; font-size: 11px; border-radius: 6px; color: white; cursor: pointer; user-select: none; opacity: 0; transition: opacity 0.15s ease; position: absolute; bottom: 10px; box-shadow: 0 0 6px rgb(0 0 0 / 0.8);
-}
-button.reportBtn { left: 10px; background-color: var(--btn-report-bg); }
-button.reportBtn:hover { background-color: var(--btn-report-hover-bg); }
-button.deleteBtn { right: 10px; background-color: var(--btn-delete-bg); }
-button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
-.messageRow:hover button.reportBtn, .messageRow:hover button.deleteBtn { opacity: 1; }
+#logoutBtn { margin-top: 10px; background:#d90429; }
+#logoutBtn:hover { background:#a9031e; }
 
-/* Toasts */
 #toastContainer { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; }
 .toast { min-width: 200px; max-width: 300px; padding: 12px 18px; border-radius: 8px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateX(100%); animation: slideIn 0.4s forwards, fadeOut 0.4s 4.6s forwards; pointer-events: auto; display: flex; justify-content: space-between; align-items: center; }
 .toast.success { background-color: #38b000; }
@@ -149,17 +87,20 @@ button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
       <input id="msg" placeholder="Digite sua mensagem..." autocomplete="off" />
       <button onclick="sendMessage()">Enviar</button>
     </div>
+    <button id="logoutBtn" onclick="logout()">Sair</button>
   </div>
 </div>
 
 <div id="toastContainer"></div>
 
+<audio id="bubbleSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Configure Firebase
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
@@ -167,6 +108,7 @@ const firebaseConfig = {
   storageBucket: "legion-chat-d69be.firebasestorage.app",
   messagingSenderId: "880449921734",
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
+  measurementId: "G-3TJ325N7MQ"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -178,11 +120,12 @@ const msgInput=document.getElementById("msg");
 const messages=document.getElementById("messages");
 const userInfo=document.getElementById("userInfo");
 const onlineUsersP=document.getElementById("onlineUsers");
+const bubbleSound=document.getElementById("bubbleSound");
 
 let currentUser=null;
 let username="";
 
-// Toast
+// Toasts
 function showToast(msg,type="info",dur=5000){
   const container=document.getElementById("toastContainer");
   const toast=document.createElement("div");
@@ -199,9 +142,9 @@ function clearInputs(){ usernameInput.value=""; passwordInput.value=""; msgInput
 // Registro
 window.register=async()=>{
   if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
-  const email= `${usernameInput.value}@chat.local`; // criar email fictício
+  const email=`${usernameInput.value}@chat.local`;
   try{
-    const userCred = await createUserWithEmailAndPassword(auth,email,passwordInput.value);
+    const userCred=await createUserWithEmailAndPassword(auth,email,passwordInput.value);
     await setDoc(doc(db,"users",userCred.user.uid),{name:usernameInput.value, online:true,lastOnline:serverTimestamp()});
     showToast("Conta criada com sucesso!","success");
     clearInputs();
@@ -211,19 +154,25 @@ window.register=async()=>{
 // Login
 window.login=async()=>{
   if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
-  const email= `${usernameInput.value}@chat.local`;
-  try{
-    await signInWithEmailAndPassword(auth,email,passwordInput.value);
-    clearInputs();
-  }catch(e){ showToast("Erro no login: "+e.message,"error"); }
+  const email=`${usernameInput.value}@chat.local`;
+  try{ await signInWithEmailAndPassword(auth,email,passwordInput.value); clearInputs(); }catch(e){ showToast("Erro no login: "+e.message,"error"); }
 };
 
-// Estado auth
-onAuthStateChanged(auth, async user=>{
+// Logout
+window.logout=async()=>{
+  if(currentUser){
+    await setDoc(doc(db,"users",currentUser.uid),{online:false,lastOnline:serverTimestamp()},{merge:true});
+    await signOut(auth);
+    showToast("Desconectado","info");
+  }
+};
+
+// Auth state
+onAuthStateChanged(auth,async user=>{
   if(user){
     currentUser=user;
-    const userDoc = await getDoc(doc(db,"users",user.uid));
-    username = userDoc.exists()?userDoc.data().name:"Usuário";
+    const userDoc=await getDoc(doc(db,"users",user.uid));
+    username=userDoc.exists()?userDoc.data().name:"Usuário";
     await setDoc(doc(db,"users",user.uid),{online:true,lastOnline:serverTimestamp(),name:username},{merge:true});
     document.getElementById("auth").style.display="none";
     document.getElementById("chat").style.display="flex";
@@ -239,11 +188,12 @@ onAuthStateChanged(auth, async user=>{
   }
 });
 
-// Mensagens
+// Enviar mensagem
 window.sendMessage=async()=>{
   if(!msgInput.value.trim()) return;
   try{
-    await addDoc(collection(db,"messages"),{text:msgInput.value,user:username,uid:currentUser.uid,createdAt:serverTimestamp(),reportedBy:[]});
+    await addDoc(collection(db,"messages"),{text:msgInput.value,user:username,uid:currentUser.uid,createdAt:serverTimestamp()});
+    bubbleSound.play();
     msgInput.value="";
   }catch(e){ showToast("Erro ao enviar mensagem: "+e.message,"error"); }
 };
@@ -266,12 +216,13 @@ function loadMessages(){
       msgDiv.innerHTML=`<div class="messageHeader">${msgData.user}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`;
       row.appendChild(msgDiv);
       messages.appendChild(row);
+      if(!isMe) bubbleSound.play();
     });
     messages.scrollTop=messages.scrollHeight;
   });
 }
 
-// Usuários online
+// Monitor online users
 function monitorOnlineUsers(){
   const q=query(collection(db,"users"));
   onSnapshot(q,snapshot=>{
