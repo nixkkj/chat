@@ -62,14 +62,14 @@ body {
   background: #22c55e;
   color: white;
   align-self: flex-end;
-  border-radius: 20px 20px 0 20px; /* cauda no canto inferior direito */
+  border-radius: 20px 20px 0 20px;
 }
 
 .other {
   background: #334155;
   color: white;
   align-self: flex-start;
-  border-radius: 20px 20px 20px 0; /* cauda no canto inferior esquerdo */
+  border-radius: 20px 20px 20px 0;
 }
 
 .meta {
@@ -175,6 +175,11 @@ signOut(auth);
 
 // Registro
 window.register = async () => {
+  if (!nameInput.value.trim() || !emailInput.value.trim() || !passwordInput.value.trim()) {
+    alert("Preencha todos os campos!");
+    return;
+  }
+
   const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   await setDoc(doc(db, "users", userCred.user.uid), {
     name: nameInput.value,
@@ -185,13 +190,17 @@ window.register = async () => {
 
 // Login
 window.login = async () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-  const userCred = await signInWithEmailAndPassword(auth, email, password);
+  if (!emailInput.value.trim() || !passwordInput.value.trim()) {
+    alert("Preencha email e senha!");
+    return;
+  }
+
+  const userCred = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   const userRef = doc(db, "users", userCred.user.uid);
   const userDoc = await getDoc(userRef);
 
-  if (userDoc.data().loggedIn) {
+  // Corrigido: checar login simultâneo
+  if (userDoc.exists() && userDoc.data().loggedIn) {
     alert("Essa conta já está conectada em outro lugar!");
     await signOut(auth);
     return;
@@ -288,9 +297,14 @@ function loadMessages() {
             <b>${msgData.user}</b><br>
             ${msgData.text}
             <div class="meta">${time}</div>
-            <button class="reportBtn" onclick='reportMessage(${JSON.stringify(msgData)})'>Denunciar</button>
       `;
 
+      // Mostrar botão de denunciar somente para mensagens dos outros
+      if (!isMe) {
+        html += `<button class="reportBtn" onclick='reportMessage(${JSON.stringify(msgData)})'>Denunciar</button>`;
+      }
+
+      // Mostrar botão de apagar apenas para admins
       if (currentUser.uid === ADMIN_UID) {
         html += `<button class="deleteBtn" onclick="deleteMessage('${msgData.id}')">Apagar</button>`;
       }
