@@ -2,21 +2,23 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Chat Profissional</title>
+<title>Chat Temático Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-primary: #0f172a;
-  --bg-chat: #1e293b;
-  --msg-me: #22c55e;
-  --msg-other: #334155;
-  --text-meta: #cbd5f5;
+  --bg-primary: #0c111b;
+  --bg-chat: rgba(30, 41, 59, 0.9);
+  --msg-me: rgba(34, 197, 94, 0.9);
+  --msg-other: rgba(51, 65, 85, 0.9);
+  --meta-color: #cbd5f5;
+  --input-bg: rgba(255,255,255,0.05);
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  margin: 0;
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-primary);
+  background: var(--bg-primary);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -25,8 +27,8 @@ body {
 }
 
 #container {
-  max-width: 900px;
   width: 95%;
+  max-width: 900px;
   margin-top: 30px;
 }
 
@@ -38,26 +40,43 @@ body {
   display: block;
   width: 80%;
   margin: 10px auto;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
+  background: var(--input-bg);
+  color: white;
 }
+
+#auth input::placeholder { color: #cbd5f5; }
 
 #auth button {
   margin: 5px;
-  padding: 10px 20px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  background: #22c55e;
+  color: white;
+  transition: 0.2s;
 }
+
+#auth button:hover { opacity: 0.85; }
 
 #chat {
   display: none;
   flex-direction: column;
   height: 80vh;
-  background-color: var(--bg-chat);
-  border-radius: 10px;
-  padding: 10px;
+  background: var(--bg-chat);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+}
+
+#userInfo {
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 #messages {
@@ -66,60 +85,47 @@ body {
   padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
+  scroll-behavior: smooth;
 }
 
-.messageRow {
-  display: flex;
-}
+.messageRow { display: flex; }
 
 .msg {
   max-width: 60%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   word-wrap: break-word;
   border-radius: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
   position: relative;
+  transition: transform 0.1s;
 }
 
-.me {
-  background-color: var(--msg-me);
-  color: white;
-  margin-left: auto;
-  border-radius: 20px 20px 0 20px;
-}
+.msg:hover { transform: scale(1.02); }
 
-.other {
-  background-color: var(--msg-other);
-  color: white;
-  margin-right: auto;
-  border-radius: 20px 20px 20px 0;
-}
+.me { background: var(--msg-me); margin-left: auto; border-radius: 20px 20px 0 20px; }
+.other { background: var(--msg-other); margin-right: auto; border-radius: 20px 20px 20px 0; }
 
-.meta {
-  font-size: 10px;
-  color: var(--text-meta);
-  margin-top: 5px;
-  text-align: right;
-}
+.meta { font-size: 10px; color: var(--meta-color); margin-top: 5px; text-align: right; }
 
 #inputArea {
   display: flex;
-  gap: 5px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 #inputArea input {
   flex: 1;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
+  background: var(--input-bg);
+  color: white;
 }
 
-button.deleteBtn { background: red; color: white; }
-button.reportBtn { background: orange; color: white; }
-
-button:hover { opacity: 0.85; }
+button.deleteBtn { background: red; color: white; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+button.reportBtn { background: orange; color: white; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+button.deleteBtn:hover, button.reportBtn:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -150,7 +156,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
@@ -164,7 +169,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Elementos
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -172,7 +176,6 @@ const msgInput = document.getElementById("msg");
 const messages = document.getElementById("messages");
 const userInfo = document.getElementById("userInfo");
 
-// Admin UID e Discord Webhook
 const ADMIN_UID = "COLE_UID_AQUI";
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
 
@@ -184,26 +187,23 @@ signOut(auth);
 
 // Registro
 window.register = async () => {
-  if (!nameInput.value.trim() || !emailInput.value.trim() || !passwordInput.value.trim()) return alert("Preencha todos os campos!");
-
+  if (!nameInput.value || !emailInput.value || !passwordInput.value) return alert("Preencha todos os campos!");
   const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   await setDoc(doc(db, "users", userCred.user.uid), { name: nameInput.value });
-  alert("Conta criada com sucesso!");
+  alert("Conta criada!");
 };
 
 // Login
 window.login = async () => {
-  if (!emailInput.value.trim() || !passwordInput.value.trim()) return alert("Preencha email e senha!");
-
+  if (!emailInput.value || !passwordInput.value) return alert("Preencha email e senha!");
   const userCred = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
   const userRef = doc(db, "users", userCred.user.uid);
   const userDoc = await getDoc(userRef);
   if (!userDoc.exists()) return alert("Usuário não encontrado!");
-
   username = userDoc.data().name;
 };
 
-// Estado de autenticação
+// Estado auth
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
@@ -231,14 +231,16 @@ window.sendMessage = async () => {
   msgInput.value = "";
 };
 
-// Denunciar
+// Denunciar mensagem profissional
 window.reportMessage = async (msgData) => {
   if (msgData.uid === currentUser.uid) return;
   if (msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) return;
 
   const msgRef = doc(db, "messages", msgData.id);
-  await updateDoc(msgRef, { reportedBy: [...(msgData.reportedBy||[]), currentUser.uid] });
+  const updatedReportedBy = msgData.reportedBy ? [...msgData.reportedBy, currentUser.uid] : [currentUser.uid];
+  await updateDoc(msgRef, { reportedBy: updatedReportedBy });
 
+  // Webhook Discord
   await fetch(DISCORD_WEBHOOK, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -272,7 +274,7 @@ function loadMessages() {
   });
 }
 
-// Deletar
+// Deletar mensagem
 window.deleteMessage = async (id) => {
   await deleteDoc(doc(db, "messages", id));
 };
