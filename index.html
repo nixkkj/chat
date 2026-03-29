@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Chat Profissional Melhorado</title>
+<title>Chat Login Simplificado</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <style>
 :root {
@@ -53,9 +53,7 @@ body {
   font-size: 16px;
 }
 
-#auth input::placeholder {
-  color: #cbd5f5;
-}
+#auth input::placeholder { color: #cbd5f5; }
 
 #auth button {
   margin: 5px;
@@ -69,9 +67,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-#auth button:hover {
-  background-color: #2ea400;
-}
+#auth button:hover { background-color: #2ea400; }
 
 #chat {
   display: none;
@@ -85,17 +81,8 @@ body {
   gap: 12px;
 }
 
-#userInfo {
-  margin-bottom: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-
-#onlineUsers {
-  font-size: 14px;
-  margin-bottom: 8px;
-  color: #cbd5f5;
-}
+#userInfo { margin-bottom: 12px; font-weight: 600; text-align: center; }
+#onlineUsers { font-size: 14px; margin-bottom: 8px; color: #cbd5f5; }
 
 #messages {
   flex: 1;
@@ -106,211 +93,49 @@ body {
   gap: 10px;
   scroll-behavior: smooth;
 }
+#messages::-webkit-scrollbar { width: 10px; }
+#messages::-webkit-scrollbar-track { background: var(--scrollbar-bg); border-radius:10px; }
+#messages::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius:10px; }
 
-#messages::-webkit-scrollbar {
-  width: 10px;
-}
-#messages::-webkit-scrollbar-track {
-  background: var(--scrollbar-bg);
-  border-radius: 10px;
-}
-#messages::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 10px;
-}
+.messageRow { display: flex; max-width: 60%; position: relative; }
+.me { margin-left: auto; background: var(--msg-me-bg); border-radius: 16px 16px 0 16px; color: white; padding: 12px 16px; box-shadow: 0 3px 8px rgb(56 176 0 / 0.6); word-break: break-word; position: relative; }
+.other { margin-right: auto; background: var(--msg-other-bg); border-radius: 16px 16px 16px 0; color: white; padding: 12px 16px; box-shadow: 0 3px 8px rgb(59 89 152 / 0.6); word-break: break-word; position: relative; }
+.messageHeader { font-weight: 700; margin-bottom: 6px; }
+.meta { font-size: 11px; color: var(--text-meta); text-align: right; margin-top: 6px; }
 
-.messageRow {
-  display: flex;
-  max-width: 60%;
-  position: relative;
-}
-
-.me {
-  margin-left: auto;
-  background: var(--msg-me-bg);
-  border-radius: 16px 16px 0 16px;
-  color: white;
-  padding: 12px 16px;
-  box-shadow: 0 3px 8px rgb(56 176 0 / 0.6);
-  word-break: break-word;
-  position: relative;
-}
-
-.other {
-  margin-right: auto;
-  background: var(--msg-other-bg);
-  border-radius: 16px 16px 16px 0;
-  color: white;
-  padding: 12px 16px;
-  box-shadow: 0 3px 8px rgb(59 89 152 / 0.6);
-  word-break: break-word;
-  position: relative;
-}
-
-.me::after, .other::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  width: 15px;
-  height: 15px;
-  background: inherit;
-}
-.me::after {
-  right: -8px;
-  border-bottom-left-radius: 15px;
-  clip-path: polygon(100% 0, 0 100%, 100% 100%);
-  box-shadow: 2px 2px 3px rgb(0 0 0 / 0.2);
-}
-.other::after {
-  left: -8px;
-  border-bottom-right-radius: 15px;
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-  box-shadow: -2px 2px 3px rgb(0 0 0 / 0.2);
-}
-
-.messageHeader {
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.meta {
-  font-size: 11px;
-  color: var(--text-meta);
-  text-align: right;
-  margin-top: 6px;
-}
-
-#inputArea {
-  margin-top: 15px;
-  display: flex;
-  gap: 12px;
-}
-
-#inputArea input {
-  flex: 1;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: none;
-  font-size: 16px;
-  background: rgba(255 255 255 / 0.05);
-  color: white;
-  outline-offset: 2px;
-  transition: outline-color 0.2s;
-}
-
-#inputArea input::placeholder {
-  color: #d3d9e6aa;
-}
-
-#inputArea input:focus {
-  outline: 2px solid var(--msg-me-bg);
-}
-
-#inputArea button {
-  padding: 14px 24px;
-  border-radius: 18px;
-  border: none;
-  background-color: var(--msg-me-bg);
-  font-weight: 700;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  user-select: none;
-}
-
-#inputArea button:hover {
-  background-color: #2ea400;
-}
+#inputArea { margin-top: 15px; display: flex; gap: 12px; }
+#inputArea input { flex: 1; padding: 14px 16px; border-radius: 18px; border: none; font-size: 16px; background: rgba(255 255 255 / 0.05); color: white; outline-offset: 2px; }
+#inputArea input::placeholder { color: #d3d9e6aa; }
+#inputArea input:focus { outline: 2px solid var(--msg-me-bg); }
+#inputArea button { padding: 14px 24px; border-radius: 18px; border: none; background-color: var(--msg-me-bg); font-weight: 700; color: white; cursor: pointer; transition: background-color 0.2s ease; user-select: none; }
+#inputArea button:hover { background-color: #2ea400; }
 
 /* Botões denunciar e apagar */
 button.reportBtn, button.deleteBtn {
-  border: none;
-  padding: 6px 10px;
-  font-weight: 700;
-  font-size: 11px;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  position: absolute;
-  bottom: 10px;
-  box-shadow: 0 0 6px rgb(0 0 0 / 0.8);
+  border: none; padding: 6px 10px; font-weight: 700; font-size: 11px; border-radius: 6px; color: white; cursor: pointer; user-select: none; opacity: 0; transition: opacity 0.15s ease; position: absolute; bottom: 10px; box-shadow: 0 0 6px rgb(0 0 0 / 0.8);
 }
-
-button.reportBtn {
-  left: 10px;
-  background-color: var(--btn-report-bg);
-}
+button.reportBtn { left: 10px; background-color: var(--btn-report-bg); }
 button.reportBtn:hover { background-color: var(--btn-report-hover-bg); }
-
-button.deleteBtn {
-  right: 10px;
-  background-color: var(--btn-delete-bg);
-}
+button.deleteBtn { right: 10px; background-color: var(--btn-delete-bg); }
 button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
-
-.messageRow:hover button.reportBtn,
-.messageRow:hover button.deleteBtn {
-  opacity: 1;
-}
+.messageRow:hover button.reportBtn, .messageRow:hover button.deleteBtn { opacity: 1; }
 
 /* Toasts */
-#toastContainer {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 9999;
-  pointer-events: none;
-}
-.toast {
-  min-width: 200px;
-  max-width: 300px;
-  padding: 12px 18px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  opacity: 0;
-  transform: translateX(100%);
-  animation: slideIn 0.4s forwards, fadeOut 0.4s 4.6s forwards;
-  pointer-events: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+#toastContainer { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; }
+.toast { min-width: 200px; max-width: 300px; padding: 12px 18px; border-radius: 8px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateX(100%); animation: slideIn 0.4s forwards, fadeOut 0.4s 4.6s forwards; pointer-events: auto; display: flex; justify-content: space-between; align-items: center; }
 .toast.success { background-color: #38b000; }
 .toast.error { background-color: #d90429; }
 .toast.info { background-color: #4a69bd; }
-.toast button.closeToast {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; transform: translateX(100%); }
-}
+.toast button.closeToast { background: transparent; border: none; color: white; font-size: 16px; cursor: pointer; margin-left: 10px; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(100%); } }
 </style>
 </head>
 <body>
 <div id="container">
-
   <div id="auth">
-    <h2>Chat Profissional 🔒</h2>
-    <input id="name" placeholder="Nome (Registro)" autocomplete="off" />
-    <input id="email" placeholder="Email" autocomplete="off" />
+    <h2>Chat 🔒</h2>
+    <input id="username" placeholder="Usuário" autocomplete="off" />
     <input id="password" type="password" placeholder="Senha" autocomplete="off" />
     <button onclick="register()">Registrar</button>
     <button onclick="login()">Entrar</button>
@@ -325,7 +150,6 @@ button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
       <button onclick="sendMessage()">Enviar</button>
     </div>
   </div>
-
 </div>
 
 <div id="toastContainer"></div>
@@ -333,131 +157,95 @@ button.deleteBtn:hover { background-color: var(--btn-delete-hover-bg); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// Configure Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
-  authDomain: "legion-chat-d69be.firebaseapp.com",
-  projectId: "legion-chat-d69be",
-  storageBucket: "legion-chat-d69be.appspot.com",
-  messagingSenderId: "880449921734",
-  appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
-  measurementId: "G-3TJ325N7MQ"
+  apiKey: "SEU_API_KEY",
+  authDomain: "SEU_AUTH_DOMAIN",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_STORAGE",
+  messagingSenderId: "SEU_MSG_ID",
+  appId: "SEU_APP_ID"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const nameInput = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const msgInput = document.getElementById("msg");
-const messages = document.getElementById("messages");
-const userInfo = document.getElementById("userInfo");
-const onlineUsersP = document.getElementById("onlineUsers");
+const usernameInput=document.getElementById("username");
+const passwordInput=document.getElementById("password");
+const msgInput=document.getElementById("msg");
+const messages=document.getElementById("messages");
+const userInfo=document.getElementById("userInfo");
+const onlineUsersP=document.getElementById("onlineUsers");
 
-const ADMIN_UID = ""; // coloque UID do admin aqui se quiser
-const DISCORD_WEBHOOK = ""; // opcional webhook
+let currentUser=null;
+let username="";
 
-let currentUser = null;
-let username = "";
-
-// Função Toast
-function showToast(message, type="info", duration=5000){
-  const container = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.classList.add("toast", type);
-  toast.innerHTML = `<span>${message}</span><button class="closeToast">&times;</button>`;
+// Toast
+function showToast(msg,type="info",dur=5000){
+  const container=document.getElementById("toastContainer");
+  const toast=document.createElement("div");
+  toast.classList.add("toast",type);
+  toast.innerHTML=`<span>${msg}</span><button class="closeToast">&times;</button>`;
   container.appendChild(toast);
-  toast.querySelector(".closeToast").onclick = () => container.removeChild(toast);
-  setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, duration);
+  toast.querySelector(".closeToast").onclick=()=>container.removeChild(toast);
+  setTimeout(()=>{ if(container.contains(toast)) container.removeChild(toast); },dur);
 }
 
 // Limpar inputs
-function clearInputs(){ nameInput.value=""; emailInput.value=""; passwordInput.value=""; msgInput.value=""; }
+function clearInputs(){ usernameInput.value=""; passwordInput.value=""; msgInput.value=""; }
 
 // Registro
-window.register = async () => {
-  if(!nameInput.value.trim()||!emailInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos!", "error"); return; }
-  try {
-    const userCred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    await setDoc(doc(db,"users",userCred.user.uid),{name:nameInput.value, online:true, lastOnline:serverTimestamp()});
-    showToast("Conta criada com sucesso!", "success");
+window.register=async()=>{
+  if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
+  const email= `${usernameInput.value}@chat.local`; // criar email fictício
+  try{
+    const userCred = await createUserWithEmailAndPassword(auth,email,passwordInput.value);
+    await setDoc(doc(db,"users",userCred.user.uid),{name:usernameInput.value, online:true,lastOnline:serverTimestamp()});
+    showToast("Conta criada com sucesso!","success");
     clearInputs();
-  } catch(e){ showToast("Erro no registro: "+e.message, "error"); }
+  }catch(e){ showToast("Erro: "+e.message,"error"); }
 };
 
 // Login
-window.login = async () => {
-  if(!emailInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha email e senha!", "error"); return; }
-  try {
-    const userCred = await signInWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
-    const userDoc = await getDoc(doc(db,"users",userCred.user.uid));
-    if(!userDoc.exists()){ showToast("Usuário não encontrado!", "error"); return; }
-    username = userDoc.data().name;
+window.login=async()=>{
+  if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
+  const email= `${usernameInput.value}@chat.local`;
+  try{
+    await signInWithEmailAndPassword(auth,email,passwordInput.value);
     clearInputs();
-  } catch(e){ showToast("Erro no login: "+e.message,"error"); }
+  }catch(e){ showToast("Erro no login: "+e.message,"error"); }
 };
 
-// Logout automático no reload
-signOut(auth);
-
-// Estado Auth
-onAuthStateChanged(auth, async (user)=>{
+// Estado auth
+onAuthStateChanged(auth, async user=>{
   if(user){
-    currentUser = user;
-    const userRef = doc(db,"users",user.uid);
-    const userDoc = await getDoc(userRef);
+    currentUser=user;
+    const userDoc = await getDoc(doc(db,"users",user.uid));
     username = userDoc.exists()?userDoc.data().name:"Usuário";
-    await setDoc(userRef,{online:true,lastOnline:serverTimestamp(),name:username},{merge:true});
-
+    await setDoc(doc(db,"users",user.uid),{online:true,lastOnline:serverTimestamp(),name:username},{merge:true});
     document.getElementById("auth").style.display="none";
     document.getElementById("chat").style.display="flex";
     userInfo.innerText=`Logado como: ${username}`;
     msgInput.focus();
-
     loadMessages();
     monitorOnlineUsers();
   }else{
-    currentUser = null;
+    currentUser=null;
     username="";
     document.getElementById("auth").style.display="block";
     document.getElementById("chat").style.display="none";
   }
 });
 
-// Enviar mensagem
-window.sendMessage = async () => {
+// Mensagens
+window.sendMessage=async()=>{
   if(!msgInput.value.trim()) return;
   try{
-    await addDoc(collection(db,"messages"),{
-      text: msgInput.value,
-      user: username,
-      uid: currentUser.uid,
-      createdAt: serverTimestamp(),
-      reportedBy:[]
-    });
+    await addDoc(collection(db,"messages"),{text:msgInput.value,user:username,uid:currentUser.uid,createdAt:serverTimestamp(),reportedBy:[]});
     msgInput.value="";
-    showToast("Mensagem enviada!", "success", 3000);
   }catch(e){ showToast("Erro ao enviar mensagem: "+e.message,"error"); }
-};
-
-// Denunciar mensagem
-window.reportMessage = async (msgData) => {
-  if(msgData.uid===currentUser.uid) return;
-  if(msgData.reportedBy && msgData.reportedBy.includes(currentUser.uid)) return;
-  try{
-    const msgRef = doc(db,"messages",msgData.id);
-    const updatedReportedBy = msgData.reportedBy?[...msgData.reportedBy,currentUser.uid]:[currentUser.uid];
-    await updateDoc(msgRef,{reportedBy:updatedReportedBy});
-    showToast("Mensagem denunciada!", "info", 4000);
-  }catch(e){ showToast("Erro ao denunciar: "+e.message,"error"); }
-};
-
-// Deletar mensagem (admin)
-window.deleteMessage = async (id) => {
-  try{ await deleteDoc(doc(db,"messages",id)); showToast("Mensagem apagada!", "info"); }
-  catch(e){ showToast("Erro ao apagar: "+e.message,"error"); }
 };
 
 // Escapar HTML
@@ -466,28 +254,16 @@ function escapeHtml(text){ const div=document.createElement("div"); div.textCont
 // Carregar mensagens
 function loadMessages(){
   const q=query(collection(db,"messages"),orderBy("createdAt"));
-  onSnapshot(q, snapshot=>{
+  onSnapshot(q,snapshot=>{
     messages.innerHTML="";
     snapshot.forEach(docSnap=>{
       const msgData=docSnap.data(); msgData.id=docSnap.id;
       const isMe=msgData.uid===currentUser.uid;
       const time=msgData.createdAt?new Date(msgData.createdAt.seconds*1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
       const row=document.createElement("div");
-      row.classList.add("messageRow");
-      row.style.justifyContent=isMe?"flex-end":"flex-start";
-      const msgDiv=document.createElement("div");
-      msgDiv.classList.add(isMe?"me":"other");
+      row.classList.add("messageRow"); row.style.justifyContent=isMe?"flex-end":"flex-start";
+      const msgDiv=document.createElement("div"); msgDiv.classList.add(isMe?"me":"other");
       msgDiv.innerHTML=`<div class="messageHeader">${msgData.user}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`;
-      if(!isMe && (!msgData.reportedBy || !msgData.reportedBy.includes(currentUser.uid))){
-        const reportBtn=document.createElement("button");
-        reportBtn.classList.add("reportBtn"); reportBtn.textContent="Denunciar";
-        reportBtn.onclick=()=>reportMessage(msgData); msgDiv.appendChild(reportBtn);
-      }
-      if(currentUser.uid===ADMIN_UID){
-        const deleteBtn=document.createElement("button");
-        deleteBtn.classList.add("deleteBtn"); deleteBtn.textContent="Apagar";
-        deleteBtn.onclick=()=>deleteMessage(msgData.id); msgDiv.appendChild(deleteBtn);
-      }
       row.appendChild(msgDiv);
       messages.appendChild(row);
     });
@@ -495,15 +271,12 @@ function loadMessages(){
   });
 }
 
-// Monitor online users
+// Usuários online
 function monitorOnlineUsers(){
-  const q = query(collection(db,"users"));
-  onSnapshot(q, snapshot=>{
+  const q=query(collection(db,"users"));
+  onSnapshot(q,snapshot=>{
     const onlineUsers=[];
-    snapshot.forEach(docSnap=>{
-      const data=docSnap.data();
-      if(data.online) onlineUsers.push(data.name);
-    });
+    snapshot.forEach(docSnap=>{ const data=docSnap.data(); if(data.online) onlineUsers.push(data.name); });
     onlineUsersP.innerText="Online: "+(onlineUsers.length>0?onlineUsers.join(", "):"Nenhum");
   });
 }
