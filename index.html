@@ -1,94 +1,253 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Chat com Logout, Toasts e Som</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-<style>
-:root {
-  --bg-primary: #0b132b;
-  --bg-chat: rgba(15, 23, 42, 0.85);
-  --msg-me-bg: #38b000;
-  --msg-other-bg: rgba(59, 89, 152, 0.85);
-  --text-meta: #d6d9df;
-  --scrollbar-bg: #223355;
-  --scrollbar-thumb: #4a69bd;
-}
+    <meta charset="UTF-8">
+    <title>Chat com Logout, Toasts e Som</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-primary: #0b132b;
+            --bg-chat: rgba(15, 23, 42, 0.85);
+            --msg-me-bg: #38b000;
+            --msg-other-bg: rgba(59, 89, 152, 0.85);
+            --text-meta: #d6d9df;
+            --scrollbar-bg: #223355;
+            --scrollbar-thumb: #4a69bd;
+        }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-primary);
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  color: white;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: white;
+        }
 
-#container { width: 100%; max-width: 900px; margin: 30px 10px 50px; }
+        #container {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px 10px 50px;
+        }
 
-#auth { text-align: center; }
-#auth input { display: block; width: 80%; max-width: 400px; margin: 10px auto; padding: 12px 16px; border-radius: 10px; border: none; background: rgba(255 255 255 / 0.05); color: white; font-size: 16px; }
-#auth input::placeholder { color: #cbd5f5; }
-#auth button { margin: 5px; padding: 12px 28px; border-radius: 10px; border: none; background-color: var(--msg-me-bg); font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color 0.2s ease; }
-#auth button:hover { background-color: #2ea400; }
+        #auth {
+            text-align: center;
+        }
 
-#chat { display: none; height: 80vh; background: var(--bg-chat); border-radius: 20px; box-shadow: 0 8px 20px rgb(0 0 0 / 0.5); padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-#userInfo { margin-bottom: 6px; font-weight: 600; text-align: center; }
-#onlineUsers { font-size: 14px; margin-bottom: 8px; color: #cbd5f5; }
+        #auth input {
+            display: block;
+            width: 80%;
+            max-width: 400px;
+            margin: 10px auto;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+        }
 
-#messages { flex: 1; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
-#messages::-webkit-scrollbar { width: 10px; }
-#messages::-webkit-scrollbar-track { background: var(--scrollbar-bg); border-radius:10px; }
-#messages::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius:10px; }
+        #auth input::placeholder {
+            color: #cbd5f5;
+        }
 
-.messageRow { display: flex; max-width: 60%; position: relative; }
-.me { margin-left: auto; background: var(--msg-me-bg); border-radius: 16px 16px 0 16px; color: white; padding: 12px 16px; box-shadow: 0 3px 8px rgb(56 176 0 / 0.6); word-break: break-word; position: relative; }
-.other { margin-right: auto; background: var(--msg-other-bg); border-radius: 16px 16px 16px 0; color: white; padding: 12px 16px; box-shadow: 0 3px 8px rgb(59 89 152 / 0.6); word-break: break-word; position: relative; }
-.messageHeader { font-weight: 700; margin-bottom: 6px; }
-.meta { font-size: 11px; color: var(--text-meta); text-align: right; margin-top: 6px; }
+        #auth button {
+            margin: 5px;
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--msg-me-bg);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
 
-#inputArea { margin-top: 15px; display: flex; gap: 12px; }
-#inputArea input { flex: 1; padding: 14px 16px; border-radius: 18px; border: none; font-size: 16px; background: rgba(255 255 255 / 0.05); color: white; outline-offset: 2px; }
-#inputArea input::placeholder { color: #d3d9e6aa; }
-#inputArea input:focus { outline: 2px solid var(--msg-me-bg); }
-#inputArea button { padding: 14px 24px; border-radius: 18px; border: none; background-color: var(--msg-me-bg); font-weight: 700; color: white; cursor: pointer; transition: background-color 0.2s ease; user-select: none; }
-#inputArea button:hover { background-color: #2ea400; }
+        #auth button:hover {
+            background-color: #2ea400;
+        }
 
-#logoutBtn { margin-top: 10px; background:#d90429; }
-#logoutBtn:hover { background:#a9031e; }
+        #chat {
+            display: none;
+            height: 80vh;
+            background: var(--bg-chat);
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-#toastContainer { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; }
-.toast { min-width: 200px; max-width: 300px; padding: 12px 18px; border-radius: 8px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transform: translateX(100%); animation: slideIn 0.4s forwards, fadeOut 0.4s 4.6s forwards; pointer-events: auto; display: flex; justify-content: space-between; align-items: center; }
-.toast.success { background-color: #38b000; }
-.toast.error { background-color: #d90429; }
-.toast.info { background-color: #4a69bd; }
-.toast button.closeToast { background: transparent; border: none; color: white; font-size: 16px; cursor: pointer; margin-left: 10px; }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(100%); } }
-</style>
+        #userInfo {
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        #onlineUsers {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #cbd5f5;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+        }
+
+        #messages::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #messages::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+            border-radius:10px;
+        }
+
+        #messages::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius:10px;
+        }
+
+        .messageRow {
+            display: flex;
+            max-width: 60%;
+            position: relative;
+        }
+
+        .me {
+            margin-left: auto;
+            background: var(--msg-me-bg);
+            border-radius: 16px 16px 0 16px;
+            color: white;
+            padding: 12px 16px;
+            box-shadow: 0 3px 8px rgb(56 176 0 / 0.6);
+            word-break: break-word;
+            position: relative;
+        }
+
+        .other {
+            margin-right: auto;
+            background: var(--msg-other-bg);
+            border-radius: 16px 16px 16px 0;
+            color: white;
+            padding: 12px 16px;
+            box-shadow: 0 3px 8px rgb(59 89 152 / 0.6);
+            word-break: break-word;
+            position: relative;
+        }
+
+        .messageHeader {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .meta {
+            font-size: 11px;
+            color: var(--text-meta);
+            text-align: right;
+            margin-top: 6px;
+        }
+
+        #inputArea {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+        }
+
+        #inputArea input {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 18px;
+            border: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            outline-offset: 2px;
+        }
+
+        #inputArea input::placeholder {
+            color: #d3d9e6aa;
+        }
+
+        #inputArea input:focus {
+            outline: 2px solid var(--msg-me-bg);
+        }
+
+        #inputArea button {
+            padding: 14px 24px;
+            border-radius: 18px;
+            border: none;
+            background-color: var(--msg-me-bg);
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+
+        #inputArea button:hover {
+            background-color: #2ea400;
+        }
+
+        #logoutBtn {
+           margin-top :10px;background:#d90429; }
+         #logoutBtn:hover {background:#a9031e;}
+
+         #toastContainer {position :fixed;top :20px;right :20px;display :flex;flex-direction :column;gap :10px;z-index :9999;pointer-events :none; }
+         .toast {min-width :200px;max-width :300px;padding :12px 18px;border-radius :8px;color :white;font-weight :500;box-shadow :04pX
+         rgba(,);opacity :;transform :translateX(%)animation :slideIn , fadeOut ;pointer-events :
+         ;display :flex;justify-content :
+         space-between;align-items :
+         center;}
+         .toast.success {background-color :
+         ;}
+         .toast.error {background-color :
+         ;}
+         .toast.info {background-color :
+         ;}
+         .toast button.closeToast {background :
+         ;border :none;color :
+         ;font-size :;cursor :
+         ;margin-left :
+         ;}
+         @keyframes slideIn {from {transform :translateX(%)opacity
+          ;}to {transform :translateX(%)opacity
+          ;}}
+          @keyframes fadeOut {from {opacity
+          ;}to {opacity
+          transform
+          ;}}
+    </style>
 </head>
 <body>
 <div id="container">
-  <div id="auth">
-    <h2>Chat 🔒</h2>
-    <input id="username" placeholder="Usuário" autocomplete="off" />
-    <input id="password" type="password" placeholder="Senha" autocomplete="off" />
-    <button onclick="register()">Registrar</button>
-    <button onclick="login()">Entrar</button>
-  </div>
-
-  <div id="chat">
-    <p id="userInfo"></p>
-    <p id="onlineUsers"></p>
-    <div id="messages"></div>
-    <div id="inputArea">
-      <input id="msg" placeholder="Digite sua mensagem..." autocomplete="off" />
-      <button onclick="sendMessage()">Enviar</button>
+    <div id="auth">
+        <h2>Chat 🔒</h2>
+        <input id="username" placeholder="Usuário" autocomplete="off" />
+        <input id="password" type="password" placeholder="Senha" autocomplete="off" />
+        <button onclick="register()">Registrar</button>
+        <button onclick="login()">Entrar</button>
     </div>
-    <button id="logoutBtn" onclick="logout()">Sair</button>
-  </div>
+
+    <div id="chat">
+        <p id="userInfo"></p>
+        <p id="onlineUsers"></p>
+        <div id="messages"></div>
+        <div id="inputArea">
+           <input id="msg" placeholder="Digite sua mensagem..." autocomplete="off" />
+           <button onclick="sendMessage()">Enviar</button>
+       </div>
+       <button id="logoutBtn" onclick="logout()">Sair</button>
+   </div>
 </div>
 
 <div id="toastContainer"></div>
@@ -96,12 +255,11 @@ body {
 <audio id="bubbleSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Firebase config
-const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
   projectId: "legion-chat-d69be",
@@ -110,127 +268,155 @@ const firebaseConfig = {
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
   measurementId: "G-3TJ325N7MQ"
 };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-const usernameInput=document.getElementById("username");
-const passwordInput=document.getElementById("password");
-const msgInput=document.getElementById("msg");
-const messages=document.getElementById("messages");
-const userInfo=document.getElementById("userInfo");
-const onlineUsersP=document.getElementById("onlineUsers");
-const bubbleSound=document.getElementById("bubbleSound");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-let currentUser=null;
-let username="";
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const msgInput = document.getElementById("msg");
+    const messages = document.getElementById("messages");
+    const userInfo = document.getElementById("userInfo");
+    const onlineUsersP = document.getElementById("onlineUsers");
+    const bubbleSound = document.getElementById("bubbleSound");
 
-// Toasts
-function showToast(msg,type="info",dur=5000){
-  const container=document.getElementById("toastContainer");
-  const toast=document.createElement("div");
-  toast.classList.add("toast",type);
-  toast.innerHTML=`<span>${msg}</span><button class="closeToast">&times;</button>`;
-  container.appendChild(toast);
-  toast.querySelector(".closeToast").onclick=()=>container.removeChild(toast);
-  setTimeout(()=>{ if(container.contains(toast)) container.removeChild(toast); },dur);
-}
+    let currentUser = null;
 
-// Limpar inputs
-function clearInputs(){ usernameInput.value=""; passwordInput.value=""; msgInput.value=""; }
+    // Toasts
+    function showToast(msg, type = "info", dur = 5000) {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.innerHTML = `<span>${msg}</span><button class="closeToast">&times;</button>`;
 
-// Registro
-window.register=async()=>{
-  if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
-  const email=`${usernameInput.value}@chat.local`;
-  try{
-    const userCred=await createUserWithEmailAndPassword(auth,email,passwordInput.value);
-    await setDoc(doc(db,"users",userCred.user.uid),{name:usernameInput.value, online:true,lastOnline:serverTimestamp()});
-    showToast("Conta criada com sucesso!","success");
-    clearInputs();
-  }catch(e){ showToast("Erro: "+e.message,"error"); }
-};
+      container.appendChild(toast);
 
-// Login
-window.login=async()=>{
-  if(!usernameInput.value.trim()||!passwordInput.value.trim()){ showToast("Preencha todos os campos","error"); return; }
-  const email=`${usernameInput.value}@chat.local`;
-  try{ await signInWithEmailAndPassword(auth,email,passwordInput.value); clearInputs(); }catch(e){ showToast("Erro no login: "+e.message,"error"); }
-};
+      toast.querySelector(".closeToast").onclick = () => container.removeChild(toast);
 
-// Logout
-window.logout=async()=>{
-  if(currentUser){
-    await setDoc(doc(db,"users",currentUser.uid),{online:false,lastOnline:serverTimestamp()},{merge:true});
-    await signOut(auth);
-    showToast("Desconectado","info");
-  }
-};
+      setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, dur);
+    }
 
-// Auth state
-onAuthStateChanged(auth,async user=>{
-  if(user){
-    currentUser=user;
-    const userDoc=await getDoc(doc(db,"users",user.uid));
-    username=userDoc.exists()?userDoc.data().name:"Usuário";
-    await setDoc(doc(db,"users",user.uid),{online:true,lastOnline:serverTimestamp(),name:username},{merge:true});
-    document.getElementById("auth").style.display="none";
-    document.getElementById("chat").style.display="flex";
-    userInfo.innerText=`Logado como: ${username}`;
-    msgInput.focus();
-    loadMessages();
-    monitorOnlineUsers();
-  }else{
-    currentUser=null;
-    username="";
-    document.getElementById("auth").style.display="block";
-    document.getElementById("chat").style.display="none";
-  }
-});
+    // Limpar inputs
+    function clearInputs() {
+      usernameInput.value = "";
+      passwordInput.value = "";
+      msgInput.value = "";
+    }
 
-// Enviar mensagem
-window.sendMessage=async()=>{
-  if(!msgInput.value.trim()) return;
-  try{
-    await addDoc(collection(db,"messages"),{text:msgInput.value,user:username,uid:currentUser.uid,createdAt:serverTimestamp()});
-    bubbleSound.play();
-    msgInput.value="";
-  }catch(e){ showToast("Erro ao enviar mensagem: "+e.message,"error"); }
-};
+    // Validação de entrada
+    function validateInput(input) {
+      return input.trim() !== "";
+    }
 
-// Escapar HTML
-function escapeHtml(text){ const div=document.createElement("div"); div.textContent=text; return div.innerHTML; }
+    // Registro
+    window.register = async () => {
+      if (!validateInput(usernameInput.value) || !validateInput(passwordInput.value)) {
+          showToast("Preencha todos os campos", "error");
+          return ;
+      }
+      const email = `${usernameInput.value}@chat.local`;
+      try {
+          const userCred = await createUserWithEmailAndPassword(auth, email, passwordInput.value);
+          await setDoc(doc(db, "users", userCred.user.uid), { name : usernameInput.value , online:true , lastOnline : serverTimestamp()});
+          showToast("Conta criada com sucesso!", "success");
+          clearInputs();
+      } catch (e) {
+          showToast("Erro:" + e.message , "error");
+      }
+    };
 
-// Carregar mensagens
-function loadMessages(){
-  const q=query(collection(db,"messages"),orderBy("createdAt"));
-  onSnapshot(q,snapshot=>{
-    messages.innerHTML="";
-    snapshot.forEach(docSnap=>{
-      const msgData=docSnap.data(); msgData.id=docSnap.id;
-      const isMe=msgData.uid===currentUser.uid;
-      const time=msgData.createdAt?new Date(msgData.createdAt.seconds*1000).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"";
-      const row=document.createElement("div");
-      row.classList.add("messageRow"); row.style.justifyContent=isMe?"flex-end":"flex-start";
-      const msgDiv=document.createElement("div"); msgDiv.classList.add(isMe?"me":"other");
-      msgDiv.innerHTML=`<div class="messageHeader">${msgData.user}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`;
-      row.appendChild(msgDiv);
-      messages.appendChild(row);
-      if(!isMe) bubbleSound.play();
+    // Login
+    window.login = async () => {
+      if (!validateInput(usernameInput.value) || !validateInput(passwordInput.value)) {
+          showToast("Preencha todos os campos", "error");
+          return ;
+      }
+      const email = `${usernameInput.value}@chat.local`;
+      try{
+          await signInWithEmailAndPassword(auth, email , passwordInput.value);
+          clearInputs();
+      } catch (e){
+          showToast("Erro no login:" + e.message , "error");
+      }
+    };
+
+    // Logout
+    window.logout = async () => {
+      if(currentUser){
+          await setDoc(doc(db,"users",currentUser.uid),{online:false,lastOnline : serverTimestamp()},{merge:true});
+          await signOut(auth);
+          showToast("Desconectado","info");
+      }
+    };
+
+    // Auth state
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+          currentUser = user ;
+          const userDoc = await getDoc(doc(db,"users",user.uid));
+          username=userDoc.exists()?userDoc.data().name:"Usuário";
+          await setDoc(doc(db,"users",user.uid),{online:true,lastOnline : serverTimestamp(),name : username},{merge:true});
+          document.getElementById("auth").style.display = "none";
+          document.getElementById("chat").style.display = "flex";
+          userInfo.innerText = `Logado como:${username}`;
+          msgInput.focus();
+          loadMessages();
+          monitorOnlineUsers();
+      }else{
+          currentUser=null ;
+          username="";
+          document.getElementById("auth").style.display ="block";
+          document.getElementById("chat").style.display ="none";
+      }
     });
-    messages.scrollTop=messages.scrollHeight;
-  });
-}
 
-// Monitor online users
-function monitorOnlineUsers(){
-  const q=query(collection(db,"users"));
-  onSnapshot(q,snapshot=>{
-    const onlineUsers=[];
-    snapshot.forEach(docSnap=>{ const data=docSnap.data(); if(data.online) onlineUsers.push(data.name); });
-    onlineUsersP.innerText="Online: "+(onlineUsers.length>0?onlineUsers.join(", "):"Nenhum");
-  });
-}
+    // Enviar mensagem
+    window.sendMessage=async()=>{
+      if(!validateInput(msgInput.value)) return ;
+      try{
+          await addDoc(collection(db,"messages"),{text : msgInput.value , user : username , uid : currentUser.uid , createdAt : serverTimestamp()});
+          bubbleSound.play();
+          msgInput.value="";
+      }catch(e){
+          showToast("Erro ao enviar mensagem:"+e.message,"error");
+      }
+};
+
+   // Escapar HTML
+   function escapeHtml(text) {
+       const div = document.createElement("div");
+       div.textContent = text ;
+       return div.innerHTML ;
+   }
+
+   // Carregar mensagens
+   function loadMessages() {
+       const q = query(collection(db,"messages"),orderBy("createdAt"));
+       onSnapshot(q,snapshot=>{
+           messages.innerHTML="";
+           snapshot.forEach(docSnap=>{
+               const msgData=docSnap.data(); msgData.id=docSnap.id ;
+               const isMe=msgData.uid===currentUser.uid ;
+               const time=msgData.createdAt?new Date(msgData.createdAt.seconds*10).toLocaleTimeString("pt-BR",{hour:"",minute:""}):"";
+               const row=document.createElement("div"); row.classList.add("messageRow"); row.style.justifyContent=isMe?"flex-end":"flex-start";
+               const msgDiv=document.createElement("div"); msgDiv.classList.add(isMe?"me":"other");
+               msgDiv.innerHTML=`<div class="messageHeader">${escapeHtml(msgData.user)}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`; row.appendChild(msgDiv); messages.appendChild(row); if(!isMe) bubbleSound.play();
+           });
+           messages.scrollTop=messages.scrollHeight ;
+       });
+   }
+
+   // Monitor online users
+   function monitorOnlineUsers() {
+       const q = query(collection(db,"users"));
+       onSnapshot(q,snapshot=>{
+           const onlineUsers=[];
+           snapshot.forEach(docSnap=>{
+               const data=docSnap.data(); if(data.online) onlineUsers.push(data.name); });
+           onlineUsersP.innerText="Online:"+(onlineUsers.length>?onlineUsers.join(","):"Nenhum");
+       });
+   }
 </script>
 </body>
 </html>
