@@ -1,74 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Chat Seguro</title>
+<meta charset="UTF-8">
+<title>Chat Seguro</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
 
-    #container {
-      max-width: 400px;
-      margin: auto;
-      margin-top: 40px;
-    }
+#container {
+  max-width: 600px;
+  margin: auto;
+  padding: 10px;
+}
 
-    #chat {
-      display: none;
-      margin-top: 20px;
-      background: #1e293b;
-      padding: 10px;
-      border-radius: 10px;
-    }
+#auth {
+  margin-top: 40px;
+}
 
-    #messages {
-      height: 300px;
-      overflow-y: auto;
-      background: #020617;
-      padding: 10px;
-      border-radius: 5px;
-      text-align: left;
-    }
+#chat {
+  display: none;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: none;
-    }
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  background: #020617;
+  padding: 10px;
+  border-radius: 10px;
+}
 
-    button {
-      padding: 8px;
-      border: none;
-      background: #22c55e;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 5px;
-    }
+.messageRow {
+  display: flex;
+}
 
-    .deleteBtn {
-      background: red;
-      margin-left: 5px;
-    }
+.msg {
+  max-width: 70%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+}
 
-    .reportBtn {
-      background: orange;
-      margin-left: 5px;
-    }
+.me {
+  background: #22c55e;
+}
 
-    .meta {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-  </style>
+.other {
+  background: #334155;
+}
+
+.meta {
+  font-size: 11px;
+  color: #cbd5f5;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 5px;
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+}
+
+.deleteBtn {
+  background: red;
+  margin-left: 5px;
+}
+
+.reportBtn {
+  background: orange;
+  margin-left: 5px;
+}
+
+#inputArea {
+  display: flex;
+  gap: 5px;
+}
+</style>
 </head>
+
 <body>
 
 <div id="container">
@@ -76,9 +103,9 @@
   <div id="auth">
     <h2>🔐 Login / Registro</h2>
 
-    <input id="name" placeholder="Nome (registro)" />
-    <input id="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Senha" />
+    <input id="name" placeholder="Nome (registro)">
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Senha">
 
     <button onclick="register()">Registrar</button>
     <button onclick="login()">Entrar</button>
@@ -89,8 +116,10 @@
 
     <div id="messages"></div>
 
-    <input id="msg" placeholder="Digite..." />
-    <button onclick="sendMessage()">Enviar</button>
+    <div id="inputArea">
+      <input id="msg" placeholder="Digite...">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
   </div>
 
 </div>
@@ -131,45 +160,50 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// elementos
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const msg = document.getElementById("msg");
 const messages = document.getElementById("messages");
 const userInfo = document.getElementById("userInfo");
-// 👑 admin
-const ADMIN_UID = "COLE_UID_AQUI";
 
-// 📡 webhook discord
+// configs
+const ADMIN_UID = "COLE_UID_AQUI";
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
 
 let currentUser = null;
 let username = "";
 
-// 🔐 FORÇAR LOGOUT AO RECARREGAR
+// logout ao recarregar
 signOut(auth);
 
-// 📝 registro
+// registro
 window.register = async () => {
-  const name = nameInput.value;
-  const email = emailInput.value;
-  const password = passwordInput.value;
-
-  const userCred = await createUserWithEmailAndPassword(auth, email, password);
+  const userCred = await createUserWithEmailAndPassword(
+    auth,
+    emailInput.value,
+    passwordInput.value
+  );
 
   await setDoc(doc(db, "users", userCred.user.uid), {
-    name: name
+    name: nameInput.value
   });
 
   alert("Conta criada!");
 };
 
-// 🔐 login
+// login
 window.login = async () => {
-  await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+  await signInWithEmailAndPassword(
+    auth,
+    emailInput.value,
+    passwordInput.value
+  );
 };
 
-// 👤 estado
+// estado auth
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
@@ -177,9 +211,8 @@ auth.onAuthStateChanged(async (user) => {
     const userDoc = await getDoc(doc(db, "users", user.uid));
     username = userDoc.data().name;
 
-    // esconder login
     document.getElementById("auth").style.display = "none";
-    document.getElementById("chat").style.display = "block";
+    document.getElementById("chat").style.display = "flex";
 
     userInfo.innerText = "Logado como: " + username;
 
@@ -187,7 +220,7 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-// 📤 enviar
+// enviar msg
 window.sendMessage = async () => {
   if (!msg.value.trim()) return;
 
@@ -201,25 +234,24 @@ window.sendMessage = async () => {
   msg.value = "";
 };
 
-// 🚨 denunciar
+// denunciar
 window.reportMessage = async (msgData) => {
-
   await fetch(DISCORD_WEBHOOK, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
       content:
         "🚨 DENÚNCIA\n\n" +
-        "👤 Denunciado: " + msgData.user + "\n" +
-        "🧑 Denunciante: " + username + "\n" +
+        "👤 Reportado: " + msgData.user + "\n" +
+        "🧑 Quem Reportou: " + username + "\n" +
         "💬 Mensagem: " + msgData.text
     })
   });
 
-  alert("Denunciado com sucesso!");
+  alert("Denunciado!");
 };
 
-// 📥 mensagens
+// carregar mensagens
 function loadMessages() {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
@@ -229,6 +261,8 @@ function loadMessages() {
     snapshot.forEach((docSnap) => {
       const msgData = docSnap.data();
       const id = docSnap.id;
+
+      const isMe = msgData.uid === currentUser.uid;
 
       let time = "";
       if (msgData.createdAt) {
@@ -240,27 +274,31 @@ function loadMessages() {
       }
 
       let html = `
-        <div>
-          <b>${msgData.user}</b>: ${msgData.text}
-          <div class="meta">${time}</div>
-          <button class="reportBtn"
-            onclick='reportMessage(${JSON.stringify(msgData)})'>
-            Denunciar
-          </button>
+        <div class="messageRow" style="justify-content:${isMe ? "flex-end" : "flex-start"}">
+          <div class="msg ${isMe ? "me" : "other"}">
+            <b>${msgData.user}</b><br>
+            ${msgData.text}
+            <div class="meta">${time}</div>
+            <button class="reportBtn"
+              onclick='reportMessage(${JSON.stringify(msgData)})'>
+              Denunciar
+            </button>
       `;
 
       if (currentUser.uid === ADMIN_UID) {
         html += `<button class="deleteBtn" onclick="deleteMessage('${id}')">Apagar</button>`;
       }
 
-      html += "</div>";
+      html += `</div></div>`;
 
       messages.innerHTML += html;
     });
+
+    messages.scrollTop = messages.scrollHeight;
   });
 }
 
-// 🛑 deletar
+// deletar
 window.deleteMessage = async (id) => {
   await deleteDoc(doc(db, "messages", id));
 };
