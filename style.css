@@ -1,0 +1,275 @@
+:root {
+  --bg-primary: #0b132b;
+  --bg-chat: rgba(15, 23, 42, 0.85);
+  --msg-me-bg: #38b000;
+  --msg-other-bg: rgba(59, 89, 152, 0.85);
+  --text-meta: #d6d9df;
+  --scrollbar-bg: #223355;
+  --scrollbar-thumb: #4a69bd;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  color: white;
+}
+
+#container {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px 10px 50px;
+}
+
+#auth {
+  text-align: center;
+}
+
+#auth input {
+  display: block;
+  width: 80%;
+  max-width: 400px;
+  margin: 10px auto;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 16px;
+}
+
+#auth input::placeholder {
+  color: #cbd5f5;
+}
+
+#auth button {
+  margin: 5px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--msg-me-bg);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#auth button:hover {
+  background-color: #2ea400;
+}
+
+#chat {
+  display: none;
+  height: 80vh;
+  background: var(--bg-chat);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
+  padding: 15px;
+}
+
+#userInfo {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+#onlineUsers {
+ font-size :;margin-bottom : px;color :
+#cbd5f5;}
+
+#messages {flex :;overflow-y :auto;padding-right :
+ px;display :flex;flex-direction :
+ column;gap : px;}
+#messages::-webkit-scrollbar {width :
+ px;}
+#messages::-webkit-scrollbar-track {background :
+var(--scrollbar-bg);border-radius :
+ px;}
+#messages::-webkit-scrollbar-thumb {background :
+var(--scrollbar-thumb);border-radius :
+ px;}
+
+.messageRow {display :flex;max-width :
+ ;position :relative;}
+.me {margin-left :auto;background :
+var(--msg-me-bg);border-radius :
+ px px px px;color :white;padding :
+ px;box-shadow : px px px rgb(/
+ );word-break :
+ break-word;position :relative;}
+.other {margin-right :auto;background :
+var(--msg-other-bg);border-radius :
+ px px px px;color :white;padding :
+ px;box-shadow : px px px rgb(/
+ );word-break :
+ break-word;position :relative;}
+
+.messageHeader {font-weight :
+ ;margin-bottom :
+ px;}
+.meta {font-size :
+ px;color :
+var(--text-meta);text-align :
+ right;margin-top :
+ px;}
+
+#inputArea {margin-top :
+ px;display :flex;gap :
+ px;}
+#inputArea input {flex :;padding :
+ px;border-radius :
+ px;border :none;font-size :
+ px;background :
+ rgba( , , , / );color :
+ white;outline-offset :
+ px;}
+#inputArea input::placeholder {color
+:
+ #d3d9e6aa;}
+#inputArea input:focus {outline :
+
+ px solid var(--msg-me-bg);}
+#inputArea button {padding :
+
+ px;border-radius :
+
+ px;border :
+
+none;background-color :
+
+ var(--msg-me-bg);font-weight :
+
+ ;color :white;cursor :
+
+ pointer;transition:
+
+background-color .s ease;user-select :
+
+ none;}
+#inputArea button:hover {background-color
+:#;}
+
+#logoutBtn {margin-top :
+
+ px;background:#d9}
+#logoutBtn:hover {background:#a9}
+
+#toastContainer {position :
+
+fixed;top :
+
+ px;right :
+
+ px;display :
+
+flex;flex-direction :
+
+ column;gap :
+
+ px;z-index :
+
+ ;pointer-events :
+
+ none;}
+.toast {min-width :
+
+ px;max-width :
+
+ px;padding :
+
+ px;border-radius :
+
+ px;color :
+
+ white;font-weight :
+
+ box-shadow :
+
+ rgba( , , , );
+
+opacity :
+
+ transform:
+
+ translateX(
+%);
+animation:
+
+ slideIn ,
+ fadeOut ;
+
+pointer-events:
+
+ auto;display:
+
+ flex;justify-content:
+
+ space-between;
+
+align-items:
+
+ center;}
+.toast.success {background-color
+
+ ;
+
+ ;}
+.toast.error {background-color
+
+ ;
+
+ ;}
+.toast.info {background-color
+
+ ;
+
+ ;}
+.toast button.closeToast {background
+
+ ;
+
+ border:
+
+none;color
+
+;
+
+ font-size
+
+ ;
+
+ cursor
+
+ ;
+
+ margin-left
+
+ ;
+}
+@keyframes slideIn {from {transform
+
+ translateX(
+%);
+opacity
+
+ ;}to {transform
+
+ translateX(
+%);
+opacity
+
+ ;}}
+@keyframes fadeOut {from {opacity
+
+ ;}to {opacity
+
+ transform
+
+ ;}}
+
+.ip-item {
+   margin-bottom: 5px;
+}

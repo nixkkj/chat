@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>IPs dos Usuários</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <h2>IPs dos Usuários</h2>
+        <div id="ipList"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+    <script>
+        // Inicialize o Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
+            authDomain: "legion-chat-d69be.firebaseapp.com",
+            projectId: "legion-chat-d69be",
+            storageBucket: "legion-chat-d69be.appspot.com",
+            messagingSenderId: "880449921734",
+            appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
+            measurementId: "G-3TJ325N7MQ"
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        // Função para carregar os IPs dos usuários
+        function loadIPs() {
+            const ipList = document.getElementById('ipList');
+            const q = db.collection('users').orderBy('lastOnline', 'desc');
+            q.get().then((querySnapshot) => {
+                ipList.innerHTML = ''; // Limpar a lista antes de adicionar novos IPs
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.ip) {
+                        const ipElement = document.createElement('div');
+                        ipElement.classList.add('ip-item');
+                        ipElement.innerText = `${data.name}: ${data.ip}`;
+                        ipList.appendChild(ipElement);
+                    }
+                });
+            }).catch((error) => {
+                console.error('Erro ao carregar IPs:', error);
+            });
+        }
+
+        // Carregar IPs ao carregar a página
+        window.onload = loadIPs;
+    </script>
+</body>
+</html>

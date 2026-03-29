@@ -4,229 +4,7 @@
     <meta charset="UTF-8">
     <title>Chat com Logout, Toasts e Som</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <style>
-        :root {
-            --bg-primary: #0b132b;
-            --bg-chat: rgba(15, 23, 42, 0.85);
-            --msg-me-bg: #38b000;
-            --msg-other-bg: rgba(59, 89, 152, 0.85);
-            --text-meta: #d6d9df;
-            --scrollbar-bg: #223355;
-            --scrollbar-thumb: #4a69bd;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            color: white;
-        }
-
-        #container {
-            width: 100%;
-            max-width: 900px;
-            margin: 30px 10px 50px;
-        }
-
-        #auth {
-            text-align: center;
-        }
-
-        #auth input {
-            display: block;
-            width: 80%;
-            max-width: 400px;
-            margin: 10px auto;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 16px;
-        }
-
-        #auth input::placeholder {
-            color: #cbd5f5;
-        }
-
-        #auth button {
-            margin: 5px;
-            padding: 12px 28px;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--msg-me-bg);
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        #auth button:hover {
-            background-color: #2ea400;
-        }
-
-        #chat {
-            display: none;
-            height: 80vh;
-            background: var(--bg-chat);
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        #userInfo {
-            margin-bottom: 6px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        #onlineUsers {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #cbd5f5;
-        }
-
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            scroll-behavior: smooth;
-        }
-
-        #messages::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        #messages::-webkit-scrollbar-track {
-            background: var(--scrollbar-bg);
-            border-radius:10px;
-        }
-
-        #messages::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-            border-radius:10px;
-        }
-
-        .messageRow {
-            display: flex;
-            max-width: 60%;
-            position: relative;
-        }
-
-        .me {
-            margin-left: auto;
-            background: var(--msg-me-bg);
-            border-radius: 16px 16px 0 16px;
-            color: white;
-            padding: 12px 16px;
-            box-shadow: 0 3px 8px rgb(56 176 0 / 0.6);
-            word-break: break-word;
-            position: relative;
-        }
-
-        .other {
-            margin-right: auto;
-            background: var(--msg-other-bg);
-            border-radius: 16px 16px 16px 0;
-            color: white;
-            padding: 12px 16px;
-            box-shadow: 0 3px 8px rgb(59 89 152 / 0.6);
-            word-break: break-word;
-            position: relative;
-        }
-
-        .messageHeader {
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .meta {
-            font-size: 11px;
-            color: var(--text-meta);
-            text-align: right;
-            margin-top: 6px;
-        }
-
-        #inputArea {
-            margin-top: 15px;
-            display: flex;
-            gap: 12px;
-        }
-
-        #inputArea input {
-            flex: 1;
-            padding: 14px 16px;
-            border-radius: 18px;
-            border: none;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            outline-offset: 2px;
-        }
-
-        #inputArea input::placeholder {
-            color: #d3d9e6aa;
-        }
-
-        #inputArea input:focus {
-            outline: 2px solid var(--msg-me-bg);
-        }
-
-        #inputArea button {
-            padding: 14px 24px;
-            border-radius: 18px;
-            border: none;
-            background-color: var(--msg-me-bg);
-            font-weight: 700;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            user-select: none;
-        }
-
-        #inputArea button:hover {
-            background-color: #2ea400;
-        }
-
-        #logoutBtn {
-           margin-top :10px;background:#d90429; }
-         #logoutBtn:hover {background:#a9031e;}
-
-         #toastContainer {position :fixed;top :20px;right :20px;display :flex;flex-direction :column;gap :10px;z-index :9999;pointer-events :none; }
-         .toast {min-width :200px;max-width :300px;padding :12px 18px;border-radius :8px;color :white;font-weight :500;box-shadow :04pX
-         rgba(,);opacity :;transform :translateX(%)animation :slideIn , fadeOut ;pointer-events :
-         ;display :flex;justify-content :
-         space-between;align-items :
-         center;}
-         .toast.success {background-color :
-         ;}
-         .toast.error {background-color :
-         ;}
-         .toast.info {background-color :
-         ;}
-         .toast button.closeToast {background :
-         ;border :none;color :
-         ;font-size :;cursor :
-         ;margin-left :
-         ;}
-         @keyframes slideIn {from {transform :translateX(%)opacity
-          ;}to {transform :translateX(%)opacity
-          ;}}
-          @keyframes fadeOut {from {opacity
-          ;}to {opacity
-          transform
-          ;}}
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="container">
@@ -259,16 +37,16 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
-  authDomain: "legion-chat-d69be.firebaseapp.com",
-  projectId: "legion-chat-d69be",
-  storageBucket: "legion-chat-d69be.firebasestorage.app",
-  messagingSenderId: "880449921734",
-  appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
-  measurementId: "G-3TJ325N7MQ"
-};
-
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
+      authDomain: "legion-chat-d69be.firebaseapp.com",
+      projectId: "legion-chat-d69be",
+      storageBucket: "legion-chat-d69be.appspot.com",
+      messagingSenderId: "880449921734",
+      appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
+      measurementId: "G-3TJ325N7MQ"
+    };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -282,6 +60,7 @@
     const bubbleSound = document.getElementById("bubbleSound");
 
     let currentUser = null;
+    let username = "";
 
     // Toasts
     function showToast(msg, type = "info", dur = 5000) {
@@ -309,6 +88,18 @@
       return input.trim() !== "";
     }
 
+    // Obter IP do usuário
+    async function getUserIP() {
+      try {
+          const response = await fetch('https://api.ipify.org?format=json');
+          const data = await response.json();
+          return data.ip;
+      } catch (error) {
+          console.error('Erro ao obter o IP:', error);
+          return null;
+      }
+    }
+
     // Registro
     window.register = async () => {
       if (!validateInput(usernameInput.value) || !validateInput(passwordInput.value)) {
@@ -318,7 +109,8 @@
       const email = `${usernameInput.value}@chat.local`;
       try {
           const userCred = await createUserWithEmailAndPassword(auth, email, passwordInput.value);
-          await setDoc(doc(db, "users", userCred.user.uid), { name : usernameInput.value , online:true , lastOnline : serverTimestamp()});
+          const ip = await getUserIP();
+          await setDoc(doc(db, "users", userCred.user.uid), { name : usernameInput.value , online:true , lastOnline : serverTimestamp(), ip });
           showToast("Conta criada com sucesso!", "success");
           clearInputs();
       } catch (e) {
