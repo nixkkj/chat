@@ -13,6 +13,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
     <script>
         // Inicialize o Firebase
         const firebaseConfig = {
@@ -26,12 +27,14 @@
         };
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
+        const auth = firebase.auth();
 
         // Função para carregar os IPs dos usuários
-        function loadIPs() {
+        async function loadIPs() {
             const ipList = document.getElementById('ipList');
             const q = db.collection('users').orderBy('lastOnline', 'desc');
-            q.get().then((querySnapshot) => {
+            try {
+                const querySnapshot = await q.get();
                 ipList.innerHTML = ''; // Limpar a lista antes de adicionar novos IPs
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -42,13 +45,19 @@
                         ipList.appendChild(ipElement);
                     }
                 });
-            }).catch((error) => {
+            } catch (error) {
                 console.error('Erro ao carregar IPs:', error);
-            });
+            }
         }
 
-        // Carregar IPs ao carregar a página
-        window.onload = loadIPs;
+        // Verificar autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadIPs();
+            } else {
+                window.location.href = 'index.html'; // Redirecionar para a página de login se não estiver autenticado
+            }
+        });
     </script>
 </body>
 </html>

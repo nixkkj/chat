@@ -25,6 +25,9 @@
            <button onclick="sendMessage()">Enviar</button>
        </div>
        <button id="logoutBtn" onclick="logout()">Sair</button>
+       <div id="ipLink">
+           <a href="ips.html" target="_blank">Ver Lista de IPs</a>
+       </div>
    </div>
 </div>
 
@@ -104,17 +107,17 @@
     window.register = async () => {
       if (!validateInput(usernameInput.value) || !validateInput(passwordInput.value)) {
           showToast("Preencha todos os campos", "error");
-          return ;
+          return;
       }
       const email = `${usernameInput.value}@chat.local`;
       try {
           const userCred = await createUserWithEmailAndPassword(auth, email, passwordInput.value);
           const ip = await getUserIP();
-          await setDoc(doc(db, "users", userCred.user.uid), { name : usernameInput.value , online:true , lastOnline : serverTimestamp(), ip });
+          await setDoc(doc(db, "users", userCred.user.uid), { name: usernameInput.value, online: true, lastOnline: serverTimestamp(), ip });
           showToast("Conta criada com sucesso!", "success");
           clearInputs();
       } catch (e) {
-          showToast("Erro:" + e.message , "error");
+          showToast("Erro: " + e.message, "error");
       }
     };
 
@@ -122,91 +125,100 @@
     window.login = async () => {
       if (!validateInput(usernameInput.value) || !validateInput(passwordInput.value)) {
           showToast("Preencha todos os campos", "error");
-          return ;
+          return;
       }
       const email = `${usernameInput.value}@chat.local`;
-      try{
-          await signInWithEmailAndPassword(auth, email , passwordInput.value);
+      try {
+          await signInWithEmailAndPassword(auth, email, passwordInput.value);
           clearInputs();
-      } catch (e){
-          showToast("Erro no login:" + e.message , "error");
+      } catch (e) {
+          showToast("Erro no login: " + e.message, "error");
       }
     };
 
     // Logout
     window.logout = async () => {
-      if(currentUser){
-          await setDoc(doc(db,"users",currentUser.uid),{online:false,lastOnline : serverTimestamp()},{merge:true});
+      if (currentUser) {
+          await setDoc(doc(db, "users", currentUser.uid), { online: false, lastOnline: serverTimestamp() }, { merge: true });
           await signOut(auth);
-          showToast("Desconectado","info");
+          showToast("Desconectado", "info");
       }
     };
 
     // Auth state
     onAuthStateChanged(auth, async user => {
       if (user) {
-          currentUser = user ;
-          const userDoc = await getDoc(doc(db,"users",user.uid));
-          username=userDoc.exists()?userDoc.data().name:"Usuário";
-          await setDoc(doc(db,"users",user.uid),{online:true,lastOnline : serverTimestamp(),name : username},{merge:true});
+          currentUser = user;
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          username = userDoc.exists() ? userDoc.data().name : "Usuário";
+          await setDoc(doc(db, "users", user.uid), { online: true, lastOnline: serverTimestamp(), name: username }, { merge: true });
           document.getElementById("auth").style.display = "none";
           document.getElementById("chat").style.display = "flex";
-          userInfo.innerText = `Logado como:${username}`;
+          userInfo.innerText = `Logado como: ${username}`;
           msgInput.focus();
           loadMessages();
           monitorOnlineUsers();
-      }else{
-          currentUser=null ;
-          username="";
-          document.getElementById("auth").style.display ="block";
-          document.getElementById("chat").style.display ="none";
+      } else {
+          currentUser = null;
+          username = "";
+          document.getElementById("auth").style.display = "block";
+          document.getElementById("chat").style.display = "none";
       }
     });
 
     // Enviar mensagem
-    window.sendMessage=async()=>{
-      if(!validateInput(msgInput.value)) return ;
-      try{
-          await addDoc(collection(db,"messages"),{text : msgInput.value , user : username , uid : currentUser.uid , createdAt : serverTimestamp()});
+    window.sendMessage = async () => {
+      if (!validateInput(msgInput.value)) return;
+      try {
+          await addDoc(collection(db, "messages"), { text: msgInput.value, user: username, uid: currentUser.uid, createdAt: serverTimestamp() });
           bubbleSound.play();
-          msgInput.value="";
-      }catch(e){
-          showToast("Erro ao enviar mensagem:"+e.message,"error");
+          msgInput.value = "";
+      } catch (e) {
+          showToast("Erro ao enviar mensagem: " + e.message, "error");
       }
 };
 
    // Escapar HTML
    function escapeHtml(text) {
        const div = document.createElement("div");
-       div.textContent = text ;
-       return div.innerHTML ;
+       div.textContent = text;
+       return div.innerHTML;
    }
 
    // Carregar mensagens
    function loadMessages() {
-       const q = query(collection(db,"messages"),orderBy("createdAt"));
-       onSnapshot(q,snapshot=>{
-           messages.innerHTML="";
-           snapshot.forEach(docSnap=>{
-               const msgData=docSnap.data(); msgData.id=docSnap.id ;
-               const isMe=msgData.uid===currentUser.uid ;
-               const time=msgData.createdAt?new Date(msgData.createdAt.seconds*10).toLocaleTimeString("pt-BR",{hour:"",minute:""}):"";
-               const row=document.createElement("div"); row.classList.add("messageRow"); row.style.justifyContent=isMe?"flex-end":"flex-start";
-               const msgDiv=document.createElement("div"); msgDiv.classList.add(isMe?"me":"other");
-               msgDiv.innerHTML=`<div class="messageHeader">${escapeHtml(msgData.user)}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`; row.appendChild(msgDiv); messages.appendChild(row); if(!isMe) bubbleSound.play();
+       const q = query(collection(db, "messages"), orderBy("createdAt"));
+       onSnapshot(q, snapshot => {
+           messages.innerHTML = "";
+           snapshot.forEach(docSnap => {
+               const msgData = docSnap.data();
+               msgData.id = docSnap.id;
+               const isMe = msgData.uid === currentUser.uid;
+               const time = msgData.createdAt ? new Date(msgData.createdAt.seconds * 1000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "";
+               const row = document.createElement("div");
+               row.classList.add("messageRow");
+               row.style.justifyContent = isMe ? "flex-end" : "flex-start";
+               const msgDiv = document.createElement("div");
+               msgDiv.classList.add(isMe ? "me" : "other");
+               msgDiv.innerHTML = `<div class="messageHeader">${escapeHtml(msgData.user)}</div><div>${escapeHtml(msgData.text)}</div><div class="meta">${time}</div>`;
+               row.appendChild(msgDiv);
+               messages.appendChild(row);
+               if (!isMe) bubbleSound.play();
            });
-           messages.scrollTop=messages.scrollHeight ;
+           messages.scrollTop = messages.scrollHeight;
        });
    }
 
    // Monitor online users
    function monitorOnlineUsers() {
-       const q = query(collection(db,"users"));
-       onSnapshot(q,snapshot=>{
-           const onlineUsers=[];
-           snapshot.forEach(docSnap=>{
-               const data=docSnap.data(); if(data.online) onlineUsers.push(data.name); });
-           onlineUsersP.innerText="Online:"+(onlineUsers.length>?onlineUsers.join(","):"Nenhum");
+       const q = query(collection(db, "users"));
+       onSnapshot(q, snapshot => {
+           const onlineUsers = [];
+           snapshot.forEach(docSnap => {
+               const data = docSnap.data();
+               if (data.online) onlineUsers.push(data.name);
+           });
+           onlineUsersP.innerText = "Online: " + (onlineUsers.length > 0 ? onlineUsers.join(", ") : "Nenhum");
        });
    }
 </script>
