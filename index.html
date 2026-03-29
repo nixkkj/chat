@@ -18,26 +18,6 @@
       margin-top: 40px;
     }
 
-    input {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: none;
-    }
-
-    button {
-      padding: 10px;
-      width: 100%;
-      border: none;
-      background: #22c55e;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-
     #chat {
       display: none;
       margin-top: 20px;
@@ -55,18 +35,37 @@
       text-align: left;
     }
 
-    .msg {
-      margin-bottom: 8px;
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 8px;
+      border: none;
+      background: #22c55e;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .deleteBtn {
+      background: red;
+      margin-left: 5px;
+    }
+
+    .reportBtn {
+      background: orange;
+      margin-left: 5px;
     }
 
     .meta {
       font-size: 12px;
       color: #94a3b8;
-    }
-
-    .deleteBtn {
-      background: red;
-      margin-left: 10px;
     }
   </style>
 </head>
@@ -74,14 +73,16 @@
 
 <div id="container">
 
-  <h2>🔐 Login / Registro</h2>
+  <div id="auth">
+    <h2>🔐 Login / Registro</h2>
 
-  <input id="name" placeholder="Nome (registro)" />
-  <input id="email" placeholder="Email" />
-  <input id="password" type="password" placeholder="Senha" />
+    <input id="name" placeholder="Nome (registro)" />
+    <input id="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Senha" />
 
-  <button onclick="register()">Registrar</button>
-  <button onclick="login()">Entrar</button>
+    <button onclick="register()">Registrar</button>
+    <button onclick="login()">Entrar</button>
+  </div>
 
   <div id="chat">
     <p id="userInfo"></p>
@@ -101,7 +102,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
@@ -131,21 +132,26 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 👑 UID do admin
+// 👑 admin
 const ADMIN_UID = "COLE_UID_AQUI";
+
+// 📡 webhook discord
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1487845386151526400/jUErqNQcd6WV97GJG1vjyjW-YeNHC8_ykDnp8TCFvQAGbmnEjaXCSmN8mZlnJCC0MmTZ";
 
 let currentUser = null;
 let username = "";
 
-// 📝 REGISTRO
-window.register = async function () {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+// 🔐 FORÇAR LOGOUT AO RECARREGAR
+signOut(auth);
+
+// 📝 registro
+window.register = async () => {
+  const name = nameInput.value;
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
   const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-  // salva nome no banco
   await setDoc(doc(db, "users", userCred.user.uid), {
     name: name
   });
@@ -153,43 +159,59 @@ window.register = async function () {
   alert("Conta criada!");
 };
 
-// 🔐 LOGIN
-window.login = async function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  await signInWithEmailAndPassword(auth, email, password);
+// 🔐 login
+window.login = async () => {
+  await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
 };
 
 // 👤 estado
-onAuthStateChanged(auth, async (user) => {
+auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
 
     const userDoc = await getDoc(doc(db, "users", user.uid));
     username = userDoc.data().name;
 
+    // esconder login
+    document.getElementById("auth").style.display = "none";
     document.getElementById("chat").style.display = "block";
-    document.getElementById("userInfo").innerText = "Logado como: " + username;
+
+    userInfo.innerText = "Logado como: " + username;
 
     loadMessages();
   }
 });
 
-// 📤 enviar mensagem
-window.sendMessage = async function () {
-  const input = document.getElementById("msg");
-
-  if (!input.value.trim()) return;
+// 📤 enviar
+window.sendMessage = async () => {
+  if (!msg.value.trim()) return;
 
   await addDoc(collection(db, "messages"), {
-    text: input.value,
+    text: msg.value,
     user: username,
     uid: currentUser.uid,
     createdAt: serverTimestamp()
   });
 
-  input.value = "";
+  msg.value = "";
+};
+
+// 🚨 denunciar
+window.reportMessage = async (msgData) => {
+
+  await fetch(DISCORD_WEBHOOK, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      content:
+        "🚨 DENÚNCIA\n\n" +
+        "👤 Denunciado: " + msgData.user + "\n" +
+        "🧑 Denunciante: " + username + "\n" +
+        "💬 Mensagem: " + msgData.text
+    })
+  });
+
+  alert("Denunciado com sucesso!");
 };
 
 // 📥 mensagens
@@ -197,16 +219,15 @@ function loadMessages() {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
   onSnapshot(q, (snapshot) => {
-    const messagesDiv = document.getElementById("messages");
-    messagesDiv.innerHTML = "";
+    messages.innerHTML = "";
 
     snapshot.forEach((docSnap) => {
-      const msg = docSnap.data();
+      const msgData = docSnap.data();
       const id = docSnap.id;
 
       let time = "";
-      if (msg.createdAt) {
-        time = new Date(msg.createdAt.seconds * 1000)
+      if (msgData.createdAt) {
+        time = new Date(msgData.createdAt.seconds * 1000)
           .toLocaleTimeString("pt-BR", {
             hour: "2-digit",
             minute: "2-digit"
@@ -214,26 +235,28 @@ function loadMessages() {
       }
 
       let html = `
-        <div class="msg">
-          <strong>${msg.user}</strong>: ${msg.text}
+        <div>
+          <b>${msgData.user}</b>: ${msgData.text}
           <div class="meta">${time}</div>
+          <button class="reportBtn"
+            onclick='reportMessage(${JSON.stringify(msgData)})'>
+            Denunciar
+          </button>
       `;
 
       if (currentUser.uid === ADMIN_UID) {
         html += `<button class="deleteBtn" onclick="deleteMessage('${id}')">Apagar</button>`;
       }
 
-      html += `</div>`;
+      html += "</div>";
 
-      messagesDiv.innerHTML += html;
+      messages.innerHTML += html;
     });
-
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
 }
 
 // 🛑 deletar
-window.deleteMessage = async function (id) {
+window.deleteMessage = async (id) => {
   await deleteDoc(doc(db, "messages", id));
 };
 </script>
