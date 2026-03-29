@@ -12,10 +12,34 @@
       text-align: center;
     }
 
-    #chat {
-      width: 90%;
-      max-width: 600px;
+    #container {
+      max-width: 400px;
       margin: auto;
+      margin-top: 40px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 10px;
+      width: 100%;
+      border: none;
+      background: #22c55e;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    #chat {
+      display: none;
       margin-top: 20px;
       background: #1e293b;
       padding: 10px;
@@ -25,11 +49,10 @@
     #messages {
       height: 300px;
       overflow-y: auto;
-      text-align: left;
-      padding: 10px;
       background: #020617;
+      padding: 10px;
       border-radius: 5px;
-      margin-bottom: 10px;
+      text-align: left;
     }
 
     .msg {
@@ -41,56 +64,59 @@
       color: #94a3b8;
     }
 
-    button {
-      padding: 8px;
-      border: none;
-      background: #22c55e;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
     .deleteBtn {
-      background: #ef4444;
+      background: red;
       margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
-<h1>🔐 Chat Seguro</h1>
+<div id="container">
 
-<button id="loginBtn">Entrar com Google</button>
+  <h2>🔐 Login / Registro</h2>
 
-<div id="chat" style="display:none;">
-  <p id="userInfo"></p>
+  <input id="name" placeholder="Nome (registro)" />
+  <input id="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Senha" />
 
-  <div id="messages"></div>
+  <button onclick="register()">Registrar</button>
+  <button onclick="login()">Entrar</button>
 
-  <input id="msg" placeholder="Digite..." />
-  <button onclick="sendMessage()">Enviar</button>
+  <div id="chat">
+    <p id="userInfo"></p>
+
+    <div id="messages"></div>
+
+    <input id="msg" placeholder="Digite..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 import {
   getFirestore,
+  doc,
+  setDoc,
+  getDoc,
   collection,
   addDoc,
   onSnapshot,
   query,
   orderBy,
   deleteDoc,
-  doc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
@@ -101,33 +127,50 @@ const firebaseConfig = {
   appId: "1:880449921734:web:cdf622d2af44cb6ae8adc7",
 };
 
-
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-const provider = new GoogleAuthProvider();
-
-// 👑 COLOQUE AQUI O UID DO ADMIN
+// 👑 UID do admin
 const ADMIN_UID = "COLE_UID_AQUI";
 
 let currentUser = null;
+let username = "";
 
-// 🔐 login
-document.getElementById("loginBtn").onclick = async () => {
-  await signInWithPopup(auth, provider);
+// 📝 REGISTRO
+window.register = async function () {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+  // salva nome no banco
+  await setDoc(doc(db, "users", userCred.user.uid), {
+    name: name
+  });
+
+  alert("Conta criada!");
 };
 
-// 👤 estado do usuário
-onAuthStateChanged(auth, (user) => {
+// 🔐 LOGIN
+window.login = async function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  await signInWithEmailAndPassword(auth, email, password);
+};
+
+// 👤 estado
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
 
-    document.getElementById("chat").style.display = "block";
-    document.getElementById("loginBtn").style.display = "none";
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    username = userDoc.data().name;
 
-    document.getElementById("userInfo").innerText =
-      "Logado como: " + user.displayName;
+    document.getElementById("chat").style.display = "block";
+    document.getElementById("userInfo").innerText = "Logado como: " + username;
 
     loadMessages();
   }
@@ -141,7 +184,7 @@ window.sendMessage = async function () {
 
   await addDoc(collection(db, "messages"), {
     text: input.value,
-    user: currentUser.displayName,
+    user: username,
     uid: currentUser.uid,
     createdAt: serverTimestamp()
   });
@@ -149,7 +192,7 @@ window.sendMessage = async function () {
   input.value = "";
 };
 
-// 📥 mensagens em tempo real
+// 📥 mensagens
 function loadMessages() {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
@@ -176,7 +219,6 @@ function loadMessages() {
           <div class="meta">${time}</div>
       `;
 
-      // 👑 admin real
       if (currentUser.uid === ADMIN_UID) {
         html += `<button class="deleteBtn" onclick="deleteMessage('${id}')">Apagar</button>`;
       }
