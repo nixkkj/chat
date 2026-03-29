@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Chat Legion</title>
+  <title>Chat Seguro</title>
+
   <style>
     body {
       font-family: Arial;
@@ -31,15 +32,17 @@
       margin-bottom: 10px;
     }
 
-    input {
-      padding: 10px;
-      width: 70%;
-      border-radius: 5px;
-      border: none;
+    .msg {
+      margin-bottom: 8px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #94a3b8;
     }
 
     button {
-      padding: 10px;
+      padding: 8px;
       border: none;
       background: #22c55e;
       color: white;
@@ -47,35 +50,49 @@
       cursor: pointer;
     }
 
-    p {
-      margin: 5px 0;
+    .deleteBtn {
+      background: #ef4444;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>💬 Chat</h1>
+<h1>🔐 Chat Seguro</h1>
 
-  <div id="chat">
-    <div id="messages"></div>
+<button id="loginBtn">Entrar com Google</button>
 
-    <input id="msg" placeholder="Digite sua mensagem..." />
-    <button onclick="sendMessage()">Enviar</button>
-  </div>
+<div id="chat" style="display:none;">
+  <p id="userInfo"></p>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      onSnapshot,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div id="messages"></div>
 
-    // 🔥 CONFIG DO SEU FIREBASE
-    const firebaseConfig = {
+  <input id="msg" placeholder="Digite..." />
+  <button onclick="sendMessage()">Enviar</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
   apiKey: "AIzaSyDDj9IeS53XEEv07dULX2-OWbVvQyQbf6Y",
   authDomain: "legion-chat-d69be.firebaseapp.com",
   projectId: "legion-chat-d69be",
@@ -85,38 +102,99 @@
 };
 
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    // 📤 Enviar mensagem
-    window.sendMessage = async function () {
-      const input = document.getElementById("msg");
+const provider = new GoogleAuthProvider();
 
-      if (input.value.trim() === "") return;
+// 👑 COLOQUE AQUI O UID DO ADMIN
+const ADMIN_UID = "COLE_UID_AQUI";
 
-      await addDoc(collection(db, "messages"), {
-        text: input.value,
-        createdAt: new Date()
-      });
+let currentUser = null;
 
-      input.value = "";
-    };
+// 🔐 login
+document.getElementById("loginBtn").onclick = async () => {
+  await signInWithPopup(auth, provider);
+};
 
-    // 📥 Receber mensagens em tempo real
-    const q = query(collection(db, "messages"), orderBy("createdAt"));
+// 👤 estado do usuário
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
 
-    onSnapshot(q, (snapshot) => {
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML = "";
+    document.getElementById("chat").style.display = "block";
+    document.getElementById("loginBtn").style.display = "none";
 
-      snapshot.forEach((doc) => {
-        const msg = doc.data();
-        messagesDiv.innerHTML += `<p>💬 ${msg.text}</p>`;
-      });
+    document.getElementById("userInfo").innerText =
+      "Logado como: " + user.displayName;
 
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    loadMessages();
+  }
+});
+
+// 📤 enviar mensagem
+window.sendMessage = async function () {
+  const input = document.getElementById("msg");
+
+  if (!input.value.trim()) return;
+
+  await addDoc(collection(db, "messages"), {
+    text: input.value,
+    user: currentUser.displayName,
+    uid: currentUser.uid,
+    createdAt: serverTimestamp()
+  });
+
+  input.value = "";
+};
+
+// 📥 mensagens em tempo real
+function loadMessages() {
+  const q = query(collection(db, "messages"), orderBy("createdAt"));
+
+  onSnapshot(q, (snapshot) => {
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const msg = docSnap.data();
+      const id = docSnap.id;
+
+      let time = "";
+      if (msg.createdAt) {
+        time = new Date(msg.createdAt.seconds * 1000)
+          .toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+      }
+
+      let html = `
+        <div class="msg">
+          <strong>${msg.user}</strong>: ${msg.text}
+          <div class="meta">${time}</div>
+      `;
+
+      // 👑 admin real
+      if (currentUser.uid === ADMIN_UID) {
+        html += `<button class="deleteBtn" onclick="deleteMessage('${id}')">Apagar</button>`;
+      }
+
+      html += `</div>`;
+
+      messagesDiv.innerHTML += html;
     });
-  </script>
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+}
+
+// 🛑 deletar
+window.deleteMessage = async function (id) {
+  await deleteDoc(doc(db, "messages", id));
+};
+</script>
 
 </body>
 </html>
